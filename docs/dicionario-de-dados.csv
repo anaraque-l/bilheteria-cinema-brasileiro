@@ -1,0 +1,36 @@
+atributo,tipo_pandas,papel,descricao,distintos,ausentes_%
+ano,int64,temporal (discreta),Ano de lançamento comercial,30,0.0
+cpb,str,identificador,Certificado de Produto Brasileiro — chave da ANCINE,2612,0.53
+titulo,str,identificador,Título do filme,2620,0.0
+direcao,str,categórica nominal,Direção — alta cardinalidade,1738,0.0
+genero,str,categórica nominal,"Ficção, Documentário, Animação, Videomusical",4,0.0
+produtora_maj,str,categórica nominal,Produtora brasileira majoritária,1502,0.0
+produtora_min,str,categórica nominal,Produtora minoritária (ausente = não houve),714,59.94
+distribuidora,str,categórica nominal,Distribuidora — alta cardinalidade,467,0.0
+uf_bruto,str,categórica nominal,"UF da produtora, como a ANCINE publica",87,0.27
+uf2_bruto,str,categórica nominal,"UF da produtora minoritária, como publicada",141,61.5
+max_salas,float64,numérica discreta,Máximo de salas simultâneas na carreira,384,2.13
+publico,float64,numérica contínua,Público acumulado — origem do alvo,2212,0.84
+renda_corrente,float64,numérica contínua,Renda em reais da época,2574,0.95
+uf_maj,str,categórica nominal,"UF majoritária, extraída por parsing",24,0.27
+n_ufs,float64,numérica discreta,Quantas UFs distintas aparecem no registro,4,0.27
+coproducao,int64,categórica binária,Houve produtora minoritária?,2,0.0
+decada,int64,temporal (ordinal),Década derivada do ano,4,0.0
+filmes_diretor_antes,int64,numérica discreta,Filmes anteriores da direção,12,0.0
+filmes_distribuidora_antes,int64,numérica discreta,Filmes anteriores da distribuidora,90,0.0
+filmes_produtora_antes,int64,numérica discreta,Filmes anteriores da produtora,31,0.0
+estreia_do_diretor,int64,categórica binária,É o primeiro filme da direção?,2,0.0
+experiencia_da_direcao,str,categórica ORDINAL,estreante < iniciante < estabelecida < veterana,4,0.0
+porte_da_distribuidora,str,categórica ORDINAL,"nova < pequena < média < grande, por catálogo anterior",4,0.0
+contratos_fsa,float64,numérica discreta,Contratos do Fundo Setorial do Audiovisual,6,0.53
+projetos_incentivo,float64,numérica discreta,Projetos aprovados nas leis de incentivo,5,0.53
+recebeu_fsa,float64,categórica binária,Teve investimento do FSA?,2,0.53
+recebeu_incentivo,float64,categórica binária,Teve fomento indireto aprovado?,2,0.53
+origem_do_fomento,str,categórica nominal,sem fomento / só FSA / só incentivo / ambos,4,0.53
+deflator,float64,numérica contínua,Fator IPCA do ano para 2024,30,0.0
+renda_deflacionada_2024,float64,numérica contínua,Renda em reais de 2024 (IPCA),2596,0.95
+populacao_br,float64,numérica contínua,População residente estimada (IBGE),20,23.34
+filmes_no_ano,int64,numérica discreta,Filmes brasileiros lançados no mesmo ano,27,0.0
+sucesso_global,float64,ALVO binário,Público acima da mediana de toda a base,2,0.84
+mediana_publico_do_ano,float64,numérica contínua,Mediana de público do ano,30,0.0
+sucesso_no_ano,float64,ALVO binário,Público acima da mediana do próprio ano,2,0.84

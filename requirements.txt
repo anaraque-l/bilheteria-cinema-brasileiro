@@ -1,0 +1,13 @@
+# Projeto CIN0144 - Sucesso de bilheteria do cinema brasileiro
+# Testado com Python 3.12.
+#
+# A ingestao usa so a biblioteca padrao (urllib). Nao ha dependencia de
+# `requests` de proposito: o pipeline roda em qualquer maquina do grupo
+# sem instalacao alem destas.
+
+pandas>=2.0
+numpy>=1.26
+matplotlib>=3.8
+seaborn>=0.13
+scikit-learn>=1.4
+jupyterlab>=4.0
