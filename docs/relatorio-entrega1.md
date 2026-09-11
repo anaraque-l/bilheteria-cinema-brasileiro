@@ -5,6 +5,10 @@
 **CIN0144 — Aprendizado de Máquina e Ciência de Dados**
 Centro de Informática · UFPE
 
+> Esta é a versão técnica do relatório, que vive junto do código e cita os nomes reais
+> das colunas. A versão de entrega é o arquivo `Relatorio_Entrega_1_Grupo_11.docx`,
+> nesta mesma pasta, com o mesmo conteúdo escrito em linguagem corrida.
+
 ---
 
 ## Sumário executivo

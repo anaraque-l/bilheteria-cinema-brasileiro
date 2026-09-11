@@ -43,7 +43,7 @@ três atos**, em que cada um só faz sentido depois do anterior:
 |---|---|---|
 | **1** | pessoa 1 | "A bilheteria é **absurdamente desigual** — e isso decide tudo." |
 | **2** | pessoa 2 | "A definição óbvia de sucesso **mede o ano**, não o filme." |
-| **3** | pessoa 3 | "E há três atalhos que dão 0,99 sem aprender nada. **Medimos os três.**" |
+| **3** | pessoa 3 | "E nada disso é opinião: **medimos tudo**, inclusive os três atalhos." |
 
 **Cada passagem de bastão é uma pergunta que a próxima pessoa responde.** Estão no
 roteiro, em itálico. Decorem a sua — é o que faz a costura aparecer.
@@ -63,7 +63,7 @@ Nove telas, ~65 s cada, **9 min 40** com 20 s de folga.
 |---|---|---|---|
 | 1 — A base e a desigualdade | 1–3 | pessoa 1 | 3:15 |
 | 2 — O alvo que mede o ano | 4–6 | pessoa 2 | 3:15 |
-| 3 — Os três atalhos, medidos | 7–9 | pessoa 3 | 3:10 |
+| 3 — A prova e os três atalhos | 7–9 | pessoa 3 | 3:10 |
 
 **Dois relógios:** aos **3:15** a pessoa 1 termina; aos **6:30** a pessoa 2 termina.
 Perguntas: **quem é dono do ato responde**.
@@ -203,7 +203,7 @@ Aí mostrem a figura:
 
 ⚠️ **Digam a ressalva, é o que impede a pergunta:**
 
-> "O FSA foi criado em 2006, então `recebeu_fsa` tem **ρ = 0,511 com o ano** — é em
+> "O FSA foi criado em 2006, então o indicador de FSA tem **ρ = 0,511 com o ano** — é em
 > parte um marcador de filme recente. Mas dentro dos anos 2010 isoladamente o gradiente
 > se mantém, 80% contra 29%. O efeito sobrevive ao controle temporal."
 
@@ -212,23 +212,29 @@ Aí mostrem a figura:
 
 ---
 
-# ATO 3 — pessoa 3 · "os três atalhos, medidos" (3:10)
+# ATO 3 — pessoa 3 · "a prova, e os três atalhos" (3:10)
 
-## Tela 7 — O que está errado na base (50 s) · fig. `fig07-ausentes.png`
+## Tela 7 — A prova do ato 2 (55 s) · fig. `fig10-correlacao-com-alvo.png`
 
-Inventário rápido — este não é o destaque:
+**Esta tela existe para transformar o argumento da pessoa 2 em número.**
 
-- **Ausentes de quatro naturezas diferentes.** 60% em `produtora_min` **não é falta**: é
-  ausência estrutural, o filme não teve coprodutora. Já `max_salas` é **MNAR** — os
-  filmes sem o campo têm público mediano muito menor, então a própria ausência informa.
-- **Consistência confirmada:** o preço médio implícito do ingresso (renda ÷ público) tem
-  mediana de R$ 11,16 e nunca sai de uma faixa plausível. Nenhum valor negativo,
-  nenhuma duplicata, nenhum CPB repetido.
-- **`uf_bruto` tem 87 valores distintos para 27 UFs** — a ANCINE concatena: `RJ/RJ`,
-  `PE/RS/RJ/SP`, ` -/DF`.
-- **467 distribuidoras**, das quais **287 aparecem em um único filme**.
+> "No ato 2 vocês ouviram que definir sucesso pela mediana do próprio ano neutraliza o
+> calendário. Isso é afirmação. Aqui está a medida: **o ano tem correlação de +0,002 com
+> o alvo**. Dois milésimos. A quantidade de filmes lançados no ano, +0,003. O calendário
+> saiu da jogada, e não por convencimento — por número."
 
-> 🗣 *"Agora o que interessa: a gente parou de argumentar e foi medir."*
+> "O que sobra é modesto, e isso era esperado. O atributo honesto mais associado ao alvo
+> é a quantidade de projetos de incentivo, **+0,274**, seguido do histórico da direção,
+> +0,193, e do da distribuidora, +0,183. Nenhum chega a 0,3. Se um atributo sozinho
+> explicasse o sucesso de um filme, não existiria indústria de cinema."
+
+> "E o painel da direita muda o ranking. Para categórica, Spearman não serve: usamos o
+> **V de Cramér**. **Gênero, com 0,338, é o atributo mais associado ao alvo em toda a
+> base** — acima de qualquer numérica. Isso tem consequência prática imediata: nesta
+> base, a codificação das categóricas importa mais que a transformação das numéricas."
+
+> 🗣 *"Essa é a medida de uma decisão que a gente acertou. Faltam as três que a gente
+> quase errou."*
 
 ## Tela 8 — Os três atalhos (85 s) — **o diferencial**
 
@@ -245,8 +251,8 @@ Inventário rápido — este não é o destaque:
 **Atalho 2 — usar o máximo de salas.** +0,108 de AUC. E aqui está o argumento mais
 sutil do trabalho:
 
-> "`max_salas` *parece* característica de lançamento — a nossa proposta inicial listava
-> ele como atributo. Mas é o máximo atingido **durante** a carreira: distribuidora
+> "o máximo de salas *parece* característica de lançamento — a nossa proposta inicial listava
+> ele como atributo. Mas o campo é o máximo atingido **durante** a carreira: distribuidora
 > expande filme que vai bem. O número de salas é, em parte, **consequência** do sucesso,
 > não causa. Sem a data de estreia, não dá para separar as duas parcelas — então
 > excluímos, e publicamos quanto ele valeria."
@@ -266,14 +272,14 @@ no treino e de 2015 no teste — o modelo enxerga o futuro.
 
 | Evidência | Hipótese |
 |---|---|
-| Alvo global embute o ano | adotar `sucesso_no_ano` — **medido: −0,062** |
-| `renda` e `max_salas` posteriores | excluir — **medido: −0,163** |
+| Alvo global embute o ano | adotar o alvo relativo ao ano — **medido: −0,062** |
+| Renda e máximo de salas são posteriores | excluir — **medido: −0,163** |
 | Uso real é prever filme não estreado | partição temporal — **medido: −0,087** |
-| Assimetria 10,0 | `log1p` só no linear — **medido: +0,024 vs 0,000** |
-| 467 distribuidoras, 287 com um filme | `min_frequency` 5–15 — **medido: −0,009** |
+| Assimetria 10,0 | log só no modelo linear — **medido: +0,024 vs 0,000** |
+| 467 distribuidoras, 287 com um filme | agrupar as raras, corte de 5 a 15 — **medido: −0,009** |
 | Classes já em 50/50 | **não** balancear |
 | Cauda é o fenômeno | **não** remover outlier |
-| `recebeu_fsa` ρ = 0,511 com o ano | usar só com `ano` no modelo |
+| Indicador de FSA com ρ = 0,511 com o ano | usar só junto com o ano no modelo |
 
 **O fecho (20 s):**
 
@@ -292,8 +298,12 @@ relatório**, e vira **uma frase** se perguntarem:
 | Ficou de fora | A frase de resposta |
 |---|---|
 | **Gênero** | "Animação e ficção têm mediana uma a duas ordens acima de documentário, mas as caixas se sobrepõem muito — gênero informa, não determina. E *Videomusical* tem um único filme." |
-| **Correlação** | "Usamos Spearman, não Pearson, por causa da assimetria de 10. E há redundância que nós mesmos criamos: `filmes_diretor_antes` e `estreia_do_diretor` têm ρ = 0,98." |
+| **Correlação** | "Usamos Spearman, não Pearson, por causa da assimetria de 10. E há redundância que nós mesmos criamos: a contagem de filmes anteriores da direção e o indicador de estreia têm ρ = 0,98." |
 | **PCA** | "Descartado, e não por esquecimento: são 11 numéricas úteis, e o crescimento de dimensão vem da codificação categórica, não delas." |
+| **Inventário dos ausentes** | "Há quatro naturezas distintas de ausência. Os 60% sem produtora minoritária não são falta: o filme não teve coprodutora. Já o máximo de salas é MNAR, porque os filmes sem o campo têm público mediano muito menor — a própria ausência informa." |
+| **Consistência da base** | "O preço médio implícito do ingresso, renda dividida por público, tem mediana de R$ 11,16 e nunca sai de faixa plausível. Nenhum valor negativo, nenhuma duplicata, nenhum CPB repetido." |
+| **Cardinalidade** | "O campo de UF tem 87 valores distintos para 27 unidades da federação, porque a ANCINE concatena as UFs das coprodutoras. E são 467 distribuidoras, das quais 287 aparecem num filme só." |
+| **Ordinais e região** | "As duas ordinais se comportam diferente: a experiência da direção sobe de 0,43 a 0,69 e satura; o porte da distribuidora não é monótono, cai na faixa grande, porque mede volume de catálogo e não poder comercial. Entre as UFs com pelo menos 30 filmes, Pernambuco aparece em segundo, com 0,53." |
 
 ---
 
@@ -303,11 +313,11 @@ Cortem **tela inteira**, nunca acelerando a fala:
 
 | ordem | o que fazer | ganha |
 |---|---|---|
-| 1º | Tela 7 — falem só de `uf_bruto` e das 467 distribuidoras | 25 s |
-| 2º | Tela 2 — cortem a segunda história da coleta | 20 s |
-| 3º | Tela 6 — cortem a inversão do *só FSA*, mantenham o gradiente | 20 s |
+| 1º | Tela 2 — cortem a segunda história da coleta | 20 s |
+| 2º | Tela 6 — cortem a inversão do *só FSA*, mantenham o gradiente | 20 s |
+| 3º | Tela 7 — cortem o painel do V de Cramér, mantenham o +0,002 do ano | 25 s |
 
-**Intocáveis:** telas 3, 5, 6 e 8. São as quatro que sustentam a nota.
+**Intocáveis:** telas 3, 5 e 8, e o número +0,002 da tela 7. São as que sustentam a nota.
 
 ---
 
@@ -319,7 +329,7 @@ Cortem **tela inteira**, nunca acelerando a fala:
 - [ ] Cada pessoa responde as perguntas do **seu** ato.
 - [ ] Notebook **já executado e aberto** antes de começar.
 - [ ] Números de cor: **2.626 × 35**, **2.806**, **4.342×**, **85,6% vs 26,3%**,
-      **0,995 vs 0,725**.
+      **0,995 vs 0,725**, **+0,002** do ano com o alvo.
 - [ ] Uma pessoa só no mouse.
 
 ---
@@ -343,7 +353,7 @@ Porque não são erros — são os blockbusters, e o fenômeno que queremos prev
 distribuição é log-normal e o critério de Tukey pressupõe simetria: ele marca 17,4% da
 base. O tratamento é log, não remoção.
 
-**"`max_salas` não é uma característica de lançamento?"**
+**"O máximo de salas não é uma característica de lançamento?"**
 Em parte sim, e é o ponto mais discutível do trabalho — por isso o deixamos explícito. O
 campo é o **máximo atingido durante a carreira**, e distribuidora expande filme que vai
 bem. Sem a data de estreia não dá para separar a parcela decidida antes da que reagiu ao
@@ -360,8 +370,8 @@ nosso ambiente. Está registrado como limitação e como melhoria, não silencia
 
 **"O fomento não é vazamento?"**
 Não, e essa é justamente a diferença para a renda e para as salas: fomento é **aprovado
-antes de a obra existir**. O que exige cuidado é outra coisa — `recebeu_fsa` tem
-ρ = 0,511 com o ano, porque o FSA foi criado em 2006. Por isso ele só entra com `ano` no
+antes de a obra existir**. O que exige cuidado é outra coisa — o indicador de FSA tem
+ρ = 0,511 com o ano, porque o FSA foi criado em 2006. Por isso ele só entra junto com o ano no
 modelo.
 
 **"Por que duas variáveis ordinais e não numéricas?"**
