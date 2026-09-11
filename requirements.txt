@@ -10,4 +10,5 @@ numpy>=1.26
 matplotlib>=3.8
 seaborn>=0.13
 scikit-learn>=1.4
+scipy>=1.11          # V de Cramer e Spearman na secao 2.8
 jupyterlab>=4.0

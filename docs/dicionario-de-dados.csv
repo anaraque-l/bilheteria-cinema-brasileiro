@@ -20,8 +20,8 @@ filmes_diretor_antes,int64,numérica discreta,Filmes anteriores da direção,12,
 filmes_distribuidora_antes,int64,numérica discreta,Filmes anteriores da distribuidora,90,0.0
 filmes_produtora_antes,int64,numérica discreta,Filmes anteriores da produtora,31,0.0
 estreia_do_diretor,int64,categórica binária,É o primeiro filme da direção?,2,0.0
-experiencia_da_direcao,str,categórica ORDINAL,estreante < iniciante < estabelecida < veterana,4,0.0
-porte_da_distribuidora,str,categórica ORDINAL,"nova < pequena < média < grande, por catálogo anterior",4,0.0
+experiencia_da_direcao,category,categórica ORDINAL,estreante < iniciante < estabelecida < veterana,4,0.0
+porte_da_distribuidora,category,categórica ORDINAL,"nova < pequena < média < grande, por catálogo anterior",4,0.0
 contratos_fsa,float64,numérica discreta,Contratos do Fundo Setorial do Audiovisual,6,0.53
 projetos_incentivo,float64,numérica discreta,Projetos aprovados nas leis de incentivo,5,0.53
 recebeu_fsa,float64,categórica binária,Teve investimento do FSA?,2,0.53
