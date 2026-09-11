@@ -247,12 +247,12 @@ def montar(verboso=True):
     # anteriores a estreia, porque derivam de contagens so do passado.
     d["experiencia_da_direcao"] = _faixa_ordinal(
         d["filmes_diretor_antes"], [0, 1, 3, 6, np.inf],
-        ["estreante", "iniciante", "estabelecida", "veterana"])
+        ORDEM_ORDINAIS["experiencia_da_direcao"])
     # Cortes do porte da distribuidora: a mediana do historico e 9 e o p90 e 72,
     # entao 5 / 20 / 60 separa os quatro grupos sem deixar faixa quase vazia.
     d["porte_da_distribuidora"] = _faixa_ordinal(
         d["filmes_distribuidora_antes"], [0, 5, 20, 60, np.inf],
-        ["nova", "pequena", "media", "grande"])
+        ORDEM_ORDINAIS["porte_da_distribuidora"])
 
     # --- fomento publico ----------------------------------------------------
     # Fomento e APROVADO antes de a obra existir: e informacao legitimamente
@@ -311,12 +311,29 @@ def montar(verboso=True):
     return d
 
 
+# Ordem das categoricas ORDINAIS. Precisa viver aqui porque o CSV nao guarda
+# tipo: sem restaurar isso na leitura, um groupby ordena alfabeticamente e
+# "estabelecida" vem antes de "estreante" - o que destroi justamente a ordem
+# que torna o atributo ordinal.
+ORDEM_ORDINAIS = {
+    "experiencia_da_direcao": ["estreante", "iniciante", "estabelecida", "veterana"],
+    "porte_da_distribuidora": ["nova", "pequena", "media", "grande"],
+}
+
+
+def _restaurar_ordinais(d):
+    for col, ordem in ORDEM_ORDINAIS.items():
+        if col in d.columns:
+            d[col] = d[col].astype(pd.CategoricalDtype(categories=ordem, ordered=True))
+    return d
+
+
 def carregar():
     """Le a base pronta. Usado pelo notebook e por sensibilidades.py."""
     caminho = PRONTO / "filmes.csv"
     if not caminho.exists():
         return montar(verboso=False)
-    return pd.read_csv(caminho, encoding="utf-8")
+    return _restaurar_ordinais(pd.read_csv(caminho, encoding="utf-8"))
 
 
 if __name__ == "__main__":

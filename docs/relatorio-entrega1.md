@@ -256,7 +256,75 @@ milhares de espectadores e ficções com dezenas.
 
 📊 `reports/figuras/fig04-publico-por-genero.png`
 
-### 2.6 Relações entre variáveis
+### 2.6 Relação de cada atributo com a variável-alvo
+
+O heatmap da seção seguinte mede atributo contra atributo. Esta mede cada atributo
+contra o **alvo**, que é binário — e por isso exige duas medidas: **ρ de Spearman** para
+as numéricas, **V de Cramér** para as categóricas.
+
+| numérica | ρ com `sucesso_no_ano` | | categórica | V de Cramér |
+|---|---|---|---|---|
+| `projetos_incentivo` | **+0,274** | | `genero` | **0,338** |
+| `filmes_diretor_antes` | +0,193 | | `origem_do_fomento` | 0,320 |
+| `filmes_distribuidora_antes` | +0,183 | | `porte_da_distribuidora` | 0,205 |
+| `recebeu_fsa` | +0,164 | | `experiencia_da_direcao` | 0,192 |
+| `coproducao` | +0,136 | | `uf_maj` | 0,178 |
+| `filmes_no_ano` | **+0,003** | | `coproducao` | 0,135 |
+| **`ano`** | **+0,002** | | | |
+
+**Este quadro fecha o argumento central do relatório.** `ano` tem correlação de
+**+0,002** com o alvo, e `filmes_no_ano` de +0,003 — praticamente zero.
+
+Com `sucesso_global`, o ano seria um dos atributos mais preditivos da base, porque a
+mediana global embute o calendário (seção 3.3). Ao definir o alvo **relativo à mediana
+do próprio ano**, a informação temporal foi **completamente neutralizada**. Não é um
+argumento: é um número.
+
+**O que sobra quando o atalho sai** são correlações modestas — nenhuma numérica chega a
+0,3. Isso é esperado: se um atributo isolado explicasse o sucesso de um filme, não
+haveria indústria de cinema.
+
+**E as categóricas mudam o ranking.** Pelo V de Cramér, **`genero` é o atributo mais
+associado ao alvo em toda a base** (0,338), acima de qualquer numérica. Isso não
+apareceria num heatmap de Spearman, que não opera sobre categórica nominal.
+
+> **Implicação.** A codificação das categóricas importa mais que a transformação das
+> numéricas nesta base — é onde está o sinal. Reforça **H4** e explica **H13**: o
+> gargalo de dimensionalidade é categórico, não numérico.
+
+📊 `reports/figuras/fig10-correlacao-com-alvo.png`
+
+### 2.7 Os atributos ordinais e a dimensão regional
+
+| experiência da direção | taxa | | porte da distribuidora | taxa | | UF | taxa |
+|---|---|---|---|---|---|---|---|
+| estreante (n=1.768) | 0,43 | | nova (n=1.033) | 0,38 | | RJ (n=1.057) | 0,55 |
+| iniciante (n=581) | 0,61 | | pequena (n=592) | 0,56 | | **PE (n=92)** | **0,53** |
+| estabelecida (n=204) | **0,69** | | média (n=626) | **0,62** | | SP (n=906) | 0,51 |
+| veterana (n=51) | 0,69 | | grande (n=353) | 0,53 | | RS (n=127) | 0,36 |
+
+**A experiência da direção sobe e satura.** De 0,43 a 0,69, com a faixa veterana empatada
+com a estabelecida. Os primeiros filmes de carreira são os que mais mudam a chance; o
+retorno marginal depois desaparece. É comportamento de variável de reputação, e justifica
+ter binado a contagem em faixas em vez de usá-la crua.
+
+**O porte da distribuidora NÃO é monótono, e isso é achado.** Sobe até a faixa média e
+**cai na grande**. O atributo mede **volume de catálogo, não poder comercial** — a
+distribuidora com mais filmes na base é a Vitrine Filmes, com 189, e boa parte do que ela
+distribui é circuito de arte. Uma ordinal cuja ordem não produz gradiente monótono
+continua informativa, mas avisa que "grande" não significa o que o senso comum sugere.
+
+**A dimensão regional** varia 19 pontos entre as UFs com pelo menos 30 filmes, e
+**Pernambuco aparece em segundo**, à frente de São Paulo — com 92 filmes, não é ruído de
+amostra pequena, e é consistente com o que se sabe do setor sobre a produção pernambucana.
+
+> ⚠️ **Associação, não causalidade.** `uf_maj` é o endereço fiscal da produtora
+> majoritária, não onde o filme foi rodado nem onde foi visto — e está confundida com
+> gênero e com acesso a fomento.
+
+📊 `reports/figuras/fig11-ordinais-e-regiao.png`
+
+### 2.8 Relações entre variáveis
 
 Usamos **Spearman**, não Pearson: com assimetria acima de 10, Pearson mediria o efeito
 dos poucos blockbusters, não a relação monotônica de interesse.
