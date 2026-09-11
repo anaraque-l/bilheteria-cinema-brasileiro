@@ -20,6 +20,10 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 from scipy.optimize import brentq
 from scipy.stats import norm
 from sklearn.metrics import cohen_kappa_score, roc_auc_score
@@ -33,7 +37,20 @@ from sensibilidades import CAT_HONESTAS, NUM_HONESTAS, _pipeline, _rf  # noqa: E
 
 RAIZ = Path(__file__).resolve().parent.parent
 SAIDA = RAIZ / "reports"
+FIGURAS = SAIDA / "figuras"
 SEMENTE = 0
+
+# Paleta das outras onze figuras do relatorio: a figura nova precisa parecer da
+# mesma familia, senao o slide denuncia que foi feita depois.
+COR, COR2, CINZA = "#2b6cb0", "#c05621", "#4a5568"
+# Rotulo curto do eixo log: "1 mil" em vez de "1.000", senao as marcas colidem.
+CURTO = {1: "10", 2: "100", 3: "1 mil", 4: "10 mil", 5: "100 mil",
+         6: "1 mi", 7: "10 mi"}
+
+
+def ptbr(v):
+    """1234567 -> '1.234.567' (separador de milhar do pt-BR)."""
+    return format(int(round(v)), ",.0f").replace(",", ".")
 
 
 # ---------------------------------------------------------------------------
@@ -243,6 +260,108 @@ def utilidade_preditiva(d, R):
 
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Figura
+# ---------------------------------------------------------------------------
+
+def _mistura(v):
+    """Ajusta a mistura de duas gaussianas e devolve (pesos, centros, cruzamento).
+
+    Mesma conta de `duas_populacoes`, isolada porque a figura precisa tambem dos
+    parametros das curvas, nao so do cruzamento.
+    """
+    X = np.log10(v).reshape(-1, 1)
+    g = GaussianMixture(2, random_state=SEMENTE).fit(X)
+    o = np.argsort(g.means_.ravel())
+    w, m, sd = g.weights_[o], g.means_.ravel()[o], np.sqrt(g.covariances_.ravel())[o]
+    f = lambda t: w[0] * norm.pdf(t, m[0], sd[0]) - w[1] * norm.pdf(t, m[1], sd[1])
+    return w, m, sd, 10 ** brentq(f, m[0], m[1])
+
+
+def figura(d):
+    """fig12 - as duas populacoes da bilheteria, e a fronteira ao longo do tempo.
+
+    E a unica evidencia desta auditoria que precisa ser VISTA para convencer: no
+    painel da esquerda, a mediana cai DENTRO da populacao de circuito limitado.
+    Esse e o argumento contra o alvo atual, em uma imagem.
+    """
+    plt.rcParams.update({"figure.dpi": 110, "savefig.dpi": 160, "font.size": 10,
+                         "axes.spines.top": False, "axes.spines.right": False,
+                         "axes.grid": True, "grid.alpha": .25, "grid.linewidth": .6})
+    x = np.log10(d["publico"].to_numpy())
+    w, m, sd, cruz = _mistura(d["publico"].to_numpy())
+    fig, axes = plt.subplots(1, 2, figsize=(13, 4.6))
+
+    # --- painel 1: a mistura ------------------------------------------------
+    ax = axes[0]
+    ax.hist(x, bins=48, density=True, color="#cbd5e0", edgecolor="white",
+            linewidth=.5, label="filmes (%s)" % ptbr(len(x)))
+    grade = np.linspace(x.min(), x.max(), 600)
+    ax.plot(grade, w[0] * norm.pdf(grade, m[0], sd[0]), color=COR, lw=2,
+            label="circuito limitado — %.0f%%, centro %s" % (w[0] * 100, ptbr(10 ** m[0])))
+    ax.plot(grade, w[1] * norm.pdf(grade, m[1], sd[1]), color=COR2, lw=2,
+            label="lançamento comercial — %.0f%%, centro %s" % (w[1] * 100, ptbr(10 ** m[1])))
+    ax.axvline(np.log10(cruz), color=CINZA, lw=2)
+    ax.axvline(np.log10(d["publico"].median()), color=CINZA, ls="--", lw=1.6)
+    topo = ax.get_ylim()[1]
+    pct = (d["publico"] < cruz).mean() * 100
+    ax.annotate("fronteira\n%s espectadores\n(percentil %.0f)" % (ptbr(cruz), pct),
+                (np.log10(cruz), topo * .97), color=CINZA, fontsize=9,
+                fontweight="bold", ha="left", va="top", xytext=(6, 0),
+                textcoords="offset points")
+    ax.annotate("mediana %s\n(alvo atual)" % ptbr(d["publico"].median()),
+                (np.log10(d["publico"].median()), topo * .55), color=CINZA,
+                fontsize=9, ha="right", va="top", xytext=(-6, 0),
+                textcoords="offset points")
+    ax.set_xlabel("público (escala logarítmica)")
+    ax.set_ylabel("densidade")
+    ax.set_title("A bilheteria brasileira são duas populações, não uma\n"
+                 "mistura de 2 gaussianas ajusta melhor que 1 (BIC 8.260 vs. 8.358)",
+                 loc="left", fontsize=11, fontweight="bold")
+    ax.set_xticks(list(CURTO))
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: CURTO.get(int(round(v)), "")))
+    ax.legend(frameon=False, fontsize=8.5, loc="upper left", bbox_to_anchor=(.02, .78))
+
+    # --- painel 2: a fronteira ao longo do tempo -----------------------------
+    ax = axes[1]
+    dec = sorted(d["decada"].unique())
+    centro_alto, fronteira = [], []
+    for k in dec:
+        _, mm, _, cc = _mistura(d.loc[d["decada"] == k, "publico"].to_numpy())
+        centro_alto.append(10 ** mm[1])
+        fronteira.append(cc)
+    mediana_dec = [d.loc[d["decada"] == k, "publico"].median() for k in dec]
+    rot = ["%ds" % k for k in dec]
+
+    ax.plot(rot, centro_alto, color=COR2, lw=2, marker="o", ms=8,
+            label="centro do lançamento comercial")
+    ax.plot(rot, fronteira, color=CINZA, lw=2, marker="o", ms=8,
+            label="fronteira entre as duas populações")
+    ax.plot(rot, mediana_dec, color=COR, lw=2, marker="o", ms=8, ls="--",
+            label="mediana da década (alvo atual)")
+    for serie in (centro_alto, fronteira, mediana_dec):
+        ax.annotate(ptbr(serie[0]), (rot[0], serie[0]), fontsize=8.5, color=CINZA,
+                    xytext=(0, 9), textcoords="offset points", ha="center", va="bottom")
+        ax.annotate(ptbr(serie[-1]), (rot[-1], serie[-1]), fontsize=8.5, color=CINZA,
+                    xytext=(6, 0), textcoords="offset points", ha="left", va="center")
+    ax.set_xmargin(.10)
+    ax.margins(y=.16)
+    ax.set_yscale("log")
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: ptbr(v)))
+    ax.set_ylabel("espectadores")
+    ax.set_title("O patamar comercial resistiu a três décadas — e caiu nos anos 2020\n"
+                 "a mediana, não: ela desabou desde os anos 1990",
+                 loc="left", fontsize=11, fontweight="bold")
+    ax.legend(frameon=False, fontsize=8.5, loc="lower left")
+
+    fig.tight_layout()
+    FIGURAS.mkdir(parents=True, exist_ok=True)
+    caminho = FIGURAS / "fig12-duas-populacoes.png"
+    fig.savefig(caminho, bbox_inches="tight")
+    plt.close(fig)
+    return caminho
+
+
 def _fmt(v):
     """Numero legivel na tela: duas casas ate 10 mil, milhar separado acima."""
     return "%.2f" % v if abs(v) < 1e4 else format(v, ",.0f")
@@ -263,6 +382,8 @@ def main():
         "alvo_estabilidade_mediana": estabilidade_da_mediana_anual(d),
         "alvo_utilidade_preditiva": utilidade_preditiva(d, R),
     }
+    print("gravado: %s" % figura(d).relative_to(RAIZ))
+
     for nome, t in tabelas.items():
         caminho = SAIDA / ("%s.csv" % nome)
         t.to_csv(caminho, index=False, encoding="utf-8")

@@ -66,7 +66,7 @@ Somando os três atalhos disponíveis nesta base, a diferença é brutal:
 ├── data/
 │   ├── raw/                   bruto, versionado de proposito
 │   └── processed/filmes.csv   base analitica (2.626 x 28)
-└── reports/figuras/           as 8 figuras do relatorio, em PNG
+└── reports/figuras/           as 12 figuras do relatorio, em PNG
 ```
 
 ## Rodando

@@ -389,7 +389,7 @@ uma contagem fechada no fim do ano. Nenhum dos dois é observável no momento da
 
 Custo de corrigir V4, medido: usar o percentil do **ano anterior** (conhecido, publicado, e
 não contaminado pelo próprio filme) troca a classe de apenas **9,2%** dos filmes em relação à
-mediana do ano corrente (κ = 0,82) e custa cerca de 0,02 de AUC. **É barato e elimina uma
+mediana do ano corrente (κ = 0,82) e custa 0,03 de AUC (0,774 → 0,743). **É barato e elimina uma
 objeção que a professora tem todo direito de levantar.**
 
 Utilidade preditiva de cada alvo, com atributos só pré-estreia e partição temporal
@@ -399,9 +399,9 @@ Utilidade preditiva de cada alvo, com atributos só pré-estreia e partição te
 |---|---|---|---|---|
 | `global_P50` | 0,745 | 62,8 | 31,6 | **31,3 pts** |
 | `ano_P50` | 0,725 | 49,7 | 49,7 | 0,0 |
-| **`ano_P75`** | **0,773** | 25,2 | 25,0 | **0,2** |
+| **`ano_P75`** | **0,774** | 25,2 | 25,0 | **0,2** |
 | `ano_P90` | 0,828 | 10,6 | 10,2 | 0,3 |
-| `anoANTERIOR_P75` | 0,750 | 24,7 | 25,7 | 0,9 |
+| `anoANTERIOR_P75` | 0,743 | 25,0 | 25,7 | 0,7 |
 | `abs_100k` | 0,876 | 19,3 | 5,7 | 13,6 |
 
 Duas advertências sobre esta tabela: (a) AUC não é comparável entre alvos diferentes — cortes
@@ -508,7 +508,7 @@ Sim, e por evidência específica — não por gosto:
 - **A prevalência fica estável** (23,0 a 29,1% por década, contra 85,6→26,3 do alvo global) e
   praticamente igual em treino e teste (24,7/25,7), preservando a virtude de `sucesso_no_ano`.
 - **Usar o ano anterior elimina o vazamento de coorte** e custa pouco: 9,2% de rótulos
-  trocados, ~0,02 de AUC.
+  trocados, ~0,03 de AUC.
 - **Não é desbalanceamento problemático**: 25/75 é razão 1:3, tratável com
   `class_weight="balanced"` e avaliação por PR-AUC — e, ao contrário do 50/50, **é a
   proporção que o fenômeno tem**, não a que impusemos.

@@ -181,7 +181,32 @@ Aí mostrem a figura:
 > desbalanceamento real não está na proporção de classes: está na **distribuição do
 > alvo ao longo do tempo**."
 
+**E o remate — 20 s, só se o tempo permitir (ver Tela 5b):**
+
+> "E fomos mais longe: auditamos o nosso próprio corte. O equilíbrio 50/50 não é achado
+> nenhum — cortar na mediana devolve 50/50 em **qualquer** distribuição."
+
 > 🗣 *"E o que sobra para prever, quando se tira o ano da jogada?"*
+
+## Tela 5b — *(opcional, 45 s)* Onde os dados colocam o corte · fig. `fig12-duas-populacoes.png`
+
+**Use esta tela se sobrar tempo, ou guarde a figura para a arguição.** Ela responde à
+pergunta mais provável da banca antes de ela ser feita.
+
+> "Perguntamos onde os **dados** colocariam o corte, em vez de onde é conveniente. Em
+> escala logarítmica, o público brasileiro é uma **mistura de duas populações**: filmes de
+> circuito limitado, em torno de **915 espectadores**, que são 64% da base; e lançamentos
+> comerciais, em torno de **51 mil**. A fronteira entre as duas cai no **percentil 69**."
+
+> "E a mediana — o nosso corte — cai **dentro da primeira população**. Ou seja: ele separava
+> circuito limitado bom de circuito limitado ruim, não sucesso comercial de fracasso."
+
+> "Por isso a recomendação para a Entrega 2 é o **quartil superior**, calculado sobre o ano
+> anterior, que é o único conhecido antes da estreia. Em 1995 isso dá 155 mil espectadores;
+> em 2024, 5,3 mil. Números que alguém do mercado reconhece."
+
+> 🗣 *"Mudar o corte reclassifica um quarto dos filmes — por isso vamos reportar o resultado
+> em P50, P75 e P90."*
 
 ## Tela 6 — Fomento público: o que de fato separa (55 s) · fig. `fig09-fomento.png`
 
@@ -335,6 +360,32 @@ Cortem **tela inteira**, nunca acelerando a fala:
 ---
 
 ## Perguntas prováveis — e a resposta curta
+
+**"Por que acima da mediana significa sucesso?"** ← *a mais provável de todas*
+Não significa — foi o que descobrimos ao auditar o próprio alvo. A mediana parecia boa
+porque dá classes equilibradas, mas esse equilíbrio é aritmética, não achado: cortar na
+mediana devolve 50/50 em qualquer distribuição. E a nossa não é qualquer uma — 1% dos filmes
+concentra 36% do público, a metade inferior fica com 0,28%. Então perguntamos onde os dados
+colocariam o corte: o público é uma mistura de duas populações, circuito limitado em torno de
+915 espectadores e lançamento comercial em torno de 51 mil, com fronteira no **percentil 69**
+— e a mediana cai dentro da primeira. Nossa recomendação para a Entrega 2 é o **quartil
+superior do ano anterior**, e vamos reportar o resultado também em P50 e P90, porque trocar o
+corte reclassifica um quarto dos filmes.
+
+**"Então metade dos filmes brasileiros é sucesso?"**
+Pela definição atual, sim — e é exatamente o que a torna indefensável. Em 2020 o corte pela
+mediana do ano cai para **198 espectadores**: um filme com 218 pessoas entra na mesma classe
+de *Nada a Perder*, com 12,2 milhões.
+
+**"Vocês não estão usando informação do futuro para montar o alvo?"**
+Estávamos, e achamos isso auditando: a mediana de um ano só fecha em 31 de dezembro. Para
+prever um filme de março, o rótulo dependeria de filmes que ainda não estrearam. Por isso a
+proposta usa o percentil do **ano anterior** — custa 9,2% dos rótulos e ~0,03 de AUC.
+
+**"Qual a confiança desses rótulos?"**
+Medimos: reamostrando cada ano com *bootstrap*, **20% dos filmes** têm público dentro do
+IC95% da mediana do próprio ano. Um quinto dos rótulos é ruído amostral, e isso é um teto
+para qualquer acurácia da Entrega 2.
 
 **"Vocês não trataram o desbalanceamento?"**
 Não há desbalanceamento: o corte pela mediana produz 50,0/49,7 por construção. Provamos

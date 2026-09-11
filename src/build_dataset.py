@@ -311,6 +311,30 @@ def montar(verboso=True):
     return d
 
 
+# Colunas que NUNCA podem entrar como atributo num modelo desta base. Esta lista
+# vive aqui, e nao no notebook, porque e a mesma para qualquer experimento: quem
+# montar o X da Entrega 2 elimina estas colunas primeiro e discute depois.
+#   publico, renda_*        - sao o alvo, ou o alvo em outra unidade (rho = 0,985)
+#   max_salas               - maximo da CARREIRA: contaminado pelo desempenho (D6)
+#   mediana_publico_do_ano  - e o proprio limiar do alvo relativo
+#   filmes_no_ano           - contagem que so fecha em 31/12: nao existe na estreia
+#   sucesso_*               - os alvos
+COLUNAS_PROIBIDAS = [
+    "publico", "renda_corrente", "renda_deflacionada_2024", "max_salas",
+    "mediana_publico_do_ano", "filmes_no_ano", "sucesso_global", "sucesso_no_ano",
+]
+
+
+def atributos_legitimos(d):
+    """Devolve as colunas de `d` que podem entrar num modelo pre-estreia.
+
+    Uso: `X = d[build_dataset.atributos_legitimos(d)]`. Tambem exclui `cpb` e
+    `titulo`, que sao identificadores, nao atributos.
+    """
+    fora = set(COLUNAS_PROIBIDAS) | {"cpb", "titulo"}
+    return [c for c in d.columns if c not in fora]
+
+
 # Ordem das categoricas ORDINAIS. Precisa viver aqui porque o CSV nao guarda
 # tipo: sem restaurar isso na leitura, um groupby ordena alfabeticamente e
 # "estabelecida" vem antes de "estreante" - o que destroi justamente a ordem
