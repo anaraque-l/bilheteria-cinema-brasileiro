@@ -32,7 +32,15 @@ Somados a uma definição de alvo que embute o ano de lançamento, o caminho fá
 **AUC 0,995** e o caminho honesto entrega **0,725**. **0,27 de AUC** separa as duas
 versões, e nenhuma linha de código as distingue à primeira vista.
 
-Este relatório documenta a base, a análise exploratória, os **treze problemas**
+E há um quarto atalho, que não é de atributo nem de validação, e sim **da própria
+definição de sucesso**. Auditamos nosso alvo (§2.9 e `docs/04-auditoria-do-alvo.md`) e o
+resultado contraria o ponto de partida: o público brasileiro não é uma distribuição a ser
+partida ao meio, e sim **duas populações** — circuito limitado (64% dos filmes, centro em
+915 espectadores) e lançamento comercial (36%, centro em 51.402) —, com fronteira no
+**percentil 69**. A mediana cai *dentro* da primeira. O corte pela mediana, portanto,
+separa circuito limitado bom de circuito limitado ruim.
+
+Este relatório documenta a base, a análise exploratória, os **quinze problemas**
 identificados e as **catorze hipóteses** de pré-processamento — cada uma acompanhada da
 medida do que custa e do que vale.
 
@@ -141,6 +149,12 @@ os dois alvos candidatos:
 | `sucesso_no_ano` | público > mediana do próprio ano | 1.294 / 1.310 (49,7%) |
 
 Vinte e dois filmes têm `publico` ausente e portanto **não têm alvo**.
+
+> **Ressalva metodológica, e ela é grande.** Nenhuma das duas definições foi escolhida
+> porque representa bem o conceito de sucesso comercial: as duas cortam na mediana porque
+> a mediana é conveniente. A §2.9 mostra o que os dados dizem sobre onde o corte deveria
+> estar, e `docs/04-auditoria-do-alvo.md` audita a questão inteira — incluindo a resposta
+> à pergunta que qualquer banca faria: *por que acima da mediana significa sucesso?*
 
 ---
 
@@ -350,6 +364,38 @@ usar um modelo.
 
 ---
 
+### 2.9 O corte que os dados propõem — duas populações, não uma
+
+A §2.1 mostrou que o público é quase log-normal. Quase: em log₁₀ uma mistura de **duas**
+gaussianas ajusta melhor que uma só (BIC **8.260** contra **8.358**), e as duas componentes
+têm leitura direta no domínio:
+
+| componente | peso | centro | leitura |
+|---|---|---|---|
+| circuito limitado | 64% | **915** espectadores | mostra, festival, janela curta — 90% dos documentários caem aqui |
+| lançamento comercial | 36% | **51.402** espectadores | filme que disputa a bilheteria de fato |
+
+A fronteira entre elas — o público em que uma componente passa a dominar a outra — fica em
+**11.830 espectadores**, o **percentil 69** da base. Três consequências:
+
+1. **A mediana (2.806) cai dentro da população de circuito limitado.** O alvo atual não
+   separa sucesso comercial de fracasso comercial: separa circuito limitado bom de circuito
+   limitado ruim.
+2. **O quartil superior (P75) é o quantil redondo que cai em cima da fronteira empírica.**
+   É o único corte deste relatório que não escolhemos — foi a distribuição que o indicou.
+3. **O patamar comercial é estável e a mediana não é.** O centro da componente comercial fica
+   entre 108 mil e 130 mil espectadores nos anos 1990, 2000 e 2010 — e só colapsa nos 2020
+   (9.687). A mediana, no mesmo período, cai de 24.704 para 573. **O que desabou não foi o
+   cinema comercial brasileiro; foi a composição da lista de lançamentos.**
+
+> **Implicação.** O corte pela mediana é conveniente, não descoberto. E o equilíbrio 50/50
+> que ele produz não é evidência de nada: cortar na mediana devolve 50/50 em *qualquer*
+> distribuição — inclusive numa em que 1% dos filmes leva 36,2% do público, como é o caso.
+
+📊 `reports/figuras/fig12-duas-populacoes.png`
+
+---
+
 ## 3. Problemas identificados
 
 | # | problema | evidência | gravidade |
@@ -367,6 +413,8 @@ usar um modelo.
 | P11 | entidade fragmentada | Downtown / Paris / Downtown-Paris | baixa |
 | P12 | 22 filmes sem alvo | `publico` = `ND` | baixa |
 | P13 | `recebeu_fsa` confundido com o ano | FSA criado em 2006; ρ = 0,511 | média |
+| **P14** | **20% dos rótulos são ruído amostral** | público dentro do IC95% da mediana do ano | **alta** |
+| **P15** | **vazamento de coorte no alvo anual** | a mediana do ano só fecha em 31/12 | **alta** |
 
 ### 3.1 Valores ausentes — quatro naturezas distintas
 
@@ -432,6 +480,45 @@ cinema.
 > alvo que embute a variável errada.
 
 📊 `reports/figuras/fig08-alvo-por-decada.png`
+
+### 3.4 P14 — um quinto dos rótulos é indeterminado
+
+Reamostramos cada ano com reposição (2.000 réplicas) e calculamos o IC95% da mediana
+daquele ano. Um filme cujo público cai **dentro** desse intervalo tem classe indeterminada:
+outra amostra do mesmo mercado o colocaria do outro lado do corte.
+
+| ano | filmes | mediana | IC95% da mediana | indeterminados |
+|---|---|---|---|---|
+| 1995 | 14 | 14.230 | **5.308 – 155.000** | 50,0% |
+| 2003 | 30 | 106.579 | 57.066 – 440.066 | 33,3% |
+| 2013 | 127 | 2.376 | 1.646 – 3.708 | 18,1% |
+| 2024 | 197 | 933 | 739 – 1.314 | 13,7% |
+
+**Na base inteira, 521 filmes (20,0%) têm classe indeterminada.** Isso é um teto para
+qualquer acurácia que a Entrega 2 venha a reportar, e precisa ser dito antes do número, não
+depois. Nos anos 1990 a instabilidade é tão grande que o corte daquele ano é praticamente um
+sorteio — o IC95% de 1995 tem largura de 10,5 vezes a própria mediana.
+
+📊 `reports/alvo_estabilidade_mediana.csv`
+
+### 3.5 P15 — o alvo anual olha para o futuro
+
+`sucesso_no_ano` compara o filme com a mediana do ano *t*, que só é conhecida **em 31 de
+dezembro de t**. Para prever um filme que estreia em março, o rótulo depende de filmes que
+ainda não estrearam. O mesmo vale para o atributo `filmes_no_ano`: o total de lançamentos do
+ano é uma contagem fechada no fim do ano, não observável no momento da previsão.
+
+Há ainda uma coluna que é o **próprio limiar do alvo**: `mediana_publico_do_ano`. Ela está na
+base por transparência de auditoria e, se entrar como atributo, entrega metade da resposta.
+
+> **Lista de colunas proibidas na modelagem** — declarada em código, em
+> `build_dataset.COLUNAS_PROIBIDAS`: `publico`, `renda_corrente`,
+> `renda_deflacionada_2024`, `max_salas`, `mediana_publico_do_ano`, `filmes_no_ano`,
+> `sucesso_global`, `sucesso_no_ano`.
+
+Custo de corrigir P15, medido: usar o percentil do **ano anterior** — conhecido, publicado e
+não contaminado pelo próprio filme — troca a classe de apenas **9,2%** dos filmes (κ = 0,82)
+e custa 0,03 de AUC (0,774 → 0,743).
 
 ---
 
@@ -561,6 +648,7 @@ Além de aplicar H1–H12, as melhorias de maior retorno estão detalhadas em
 |---|---|---|---|
 | **M7** | data de estreia + **salas na 1ª semana** | muito alto | 🟢 destravada |
 | **M1** | fomento público (FSA / leis de incentivo) por CPB | alto | 🟢 destravada |
+| **M8** | **alvo = P75 do ano anterior**, com P50 e P90 como robustez | alto | imediata |
 | **M2** | histórico de **sucesso** anterior, não só contagem de filmes | alto | imediata |
 | M3 | validação temporal com janela deslizante | médio | imediata |
 | M5 | alvo alternativo: regressão em `log(publico)` | médio | imediata |
@@ -582,6 +670,16 @@ apenas o **número do contrato**, não o valor: dão `recebeu_fsa` e `recebeu_in
 como binárias, não o orçamento. Em compensação, o risco de vazamento que suspeitávamos
 desapareceu — fomento é aprovado antes de a obra existir.
 
+**M8 é a recomendação da auditoria do alvo**, e é a única da lista que não depende de
+fonte nova: `publico > P75 dos filmes brasileiros lançados no ano anterior`. Justifica-se por
+três evidências desta EDA — a fronteira empírica entre as duas populações está no percentil
+69 (§2.9), os limiares resultantes são interpretáveis em todo o período (154.940 espectadores
+em 1995, 47.439 em 2014, 5.278 em 2024), e o percentil do ano anterior é o único conhecido
+antes da estreia (§3.5). Com a condição inseparável de **reportar todo resultado também em
+P50 e P90**: entre P50 e P75 mudam de classe 24,6% dos filmes; entre P50 e P90, 39,3%
+(κ = 0,21). A definição é decisão nossa, defensável mas não única, e a robustez a ela é parte
+do resultado.
+
 M2 é a de melhor relação custo-benefício e também a de maior risco: contagem mede
 experiência, média anterior mede **reputação** — e qualquer descuido na janela temporal
 faz o alvo entrar pela porta dos fundos.
@@ -597,7 +695,7 @@ faz o alvo entrar pela porta dos fundos.
 | item | onde |
 |---|---|
 | Notebook executado, com todas as visualizações | `notebooks/` |
-| Figuras em PNG (8) | `reports/figuras/` |
+| Figuras em PNG (12) | `reports/figuras/` |
 | Dicionário de dados | `docs/dicionario-de-dados.csv` |
 | Base analítica (2.626 × 28) | `data/processed/filmes.csv` |
 | Registro das fontes, com as descartadas | `src/fontes.py` · `docs/01-fontes-de-dados.md` |
