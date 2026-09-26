@@ -11,3 +11,6 @@ Thumbs.db
 
 # data/ NAO entra aqui: a base congelada e versionada de proposito.
 # Ver docs/00-guia-do-projeto.md, secao "Por que data/raw e versionado".
+
+# clone que o notebook faz quando roda fora do Colab
+notebooks/bilheteria-cinema-brasileiro/
