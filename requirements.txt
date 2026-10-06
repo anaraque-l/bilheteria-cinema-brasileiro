@@ -10,5 +10,8 @@ numpy>=1.26
 matplotlib>=3.8
 seaborn>=0.13
 scikit-learn>=1.4
+# Entrega 2: unico jeito de por um sampler dentro do pipeline sem que ele
+# toque o fold de teste. O SMOTE e a subamostragem so agem no ajuste.
+imbalanced-learn>=0.12
 scipy>=1.11          # V de Cramer e Spearman na secao 2.8
 jupyterlab>=4.0

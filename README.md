@@ -158,6 +158,41 @@ Cada hipótese de pré-processamento foi transformada em número por
 
 ---
 
+## Entrega 2 — Pré-processamento e *pipelines*
+
+Mesma base, outra pergunta: **como cada etapa de preparação dos dados muda o
+desempenho de um kNN com k = 7 fixo?** São 144 combinações de pré-processamento,
+avaliadas com o mesmo 5-fold estratificado.
+
+**O alvo mudou, como a Entrega 1 recomendou:** sucesso passa a ser público acima do
+**percentil 75 dos filmes brasileiros do ano anterior** — um limiar conhecido antes da
+estreia e próximo da fronteira entre as duas populações de público. São 2.590 filmes,
+25,3% deles sucesso. Entram também três atributos de **histórico de sucesso** da direção,
+da distribuidora e da produtora, calculados só com anos anteriores.
+
+| etapa | opções |
+|---|---|
+| valores ausentes | mediana e moda · mediana com indicadora de ausência |
+| encoding | *one-hot* com agrupamento de raras · encoding pelo alvo |
+| normalização | sem · z-score · min-max · robusta |
+| redução | sem · PCA · seleção das 10 melhores por informação mútua |
+| balanceamento | sem · subamostragem · SMOTE |
+
+A ordem dentro de cada fold é `ausentes → encoding → normalização → redução →
+balanceamento → kNN`, e o motivo de cada posição está em
+[`src/e2/espaco.py`](src/e2/espaco.py).
+
+```bash
+python src/e2/base.py         # resumo da base e teste de que o historico nao vaza
+python src/executar_e2.py     # roda as 144; retoma de onde parou
+```
+
+Resultados em `reports/e2/`: uma linha por combinação em `resultados.csv`, uma por
+combinação e fold em `resultados_por_fold.csv`, os folds em `folds.csv` e as versões
+das bibliotecas em `ambiente.json`.
+
+---
+
 ## Licença
 
 Código sob [licença MIT](LICENSE). Os dados são públicos e pertencem aos órgãos que os
