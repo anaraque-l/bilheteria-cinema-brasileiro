@@ -2,40 +2,42 @@
 
 > Dona: Laura · Orçamento: parte das 2,0 páginas da §3
 
-<!-- Rascunho. Números de prevalência conferir com base.carregar_xy; nada daqui depende da grade. -->
+<!-- Rascunho. Conferir a proporção de sucessos com o módulo da base antes de fechar. Nada desta seção depende dos resultados da grade. -->
 
-**Por que a etapa existe.** Com o alvo P75 do ano anterior, 25,3% dos filmes são sucesso,
-uma razão de 1 : 3. A H10 da E1, "não balancear", valia para o alvo na mediana, que é 50/50
-por construção. Adotada a M8, a classe positiva passa a ser minoritária de verdade e a
-etapa se torna aplicável. Não é contradição, é consequência. A opção `sem` continua na
-grade, de modo que a H10 é testada num alvo em que poderia falhar.
+**Por que balancear.** Com o alvo em P75 do ano anterior, 25,3% dos filmes são sucesso,
+ou seja, um sucesso para cada três fracassos. Na Entrega 1 decidimos não balancear, mas
+naquela época o alvo era a mediana, que divide os filmes ao meio. Com o novo alvo a classe
+de sucesso passou a ser minoritária, e o balanceamento entrou na grade. A opção sem
+balanceamento continua lá, para testar se a decisão da E1 ainda vale.
 
-**Onde ela fica e por quê.** É a última etapa antes do kNN. Os *samplers* do
-`imbalanced-learn` só agem no `fit` do `Pipeline`, então o fold de teste nunca é
-reamostrado; é a razão de a dependência existir. Ficar depois da redução garante que PCA e
-seleção de atributos sejam ajustados só com filmes reais, e ficar no fim faz o SMOTE
-interpolar no mesmo espaço em que o kNN vai medir distância.
+**Como o desbalanceamento afeta o kNN.** O kNN classifica um filme pelo voto dos 7 filmes
+mais parecidos com ele no treino. Se pelo menos 4 forem sucesso, o filme é previsto como
+sucesso. Como a maioria dos vizinhos costuma ser fracasso, esse limite raramente é
+atingido. Outros modelos permitem dar mais peso à classe rara, mas o kNN não. A única
+forma de mudar a votação é mudar a proporção de sucessos no treino.
 
-**Por que o balanceamento mexe no kNN.** O kNN não tem `class_weight`, e com k = 7 a
-classe prevista é o voto de 7 vizinhos, de modo que a probabilidade só assume oito valores.
-Num bairro típico há três fracassos para cada sucesso, e chegar a 4 votos de 7 é difícil.
-Mudar a proporção do treino é o único jeito de mudar essa votação.
+**Onde a etapa fica.** O balanceamento é a última etapa antes do kNN, por dois motivos. O
+PCA e a seleção de atributos são ajustados antes, só com filmes reais, sem a influência de
+filmes criados artificialmente. E o SMOTE cria os filmes novos no mesmo espaço em que o
+kNN vai medir distâncias. A biblioteca imbalanced-learn garante que o balanceamento só
+aconteça no treino: os filmes de teste são avaliados como estão, sem remoção nem criação
+de exemplos. É por isso que adicionamos essa dependência ao projeto.
 
-| opção | objeto | evidência e custo |
+| opção | o que faz | vantagem e custo |
 |---|---|---|
-| `sem` | passagem direta | referência; é a H10 da E1 |
-| `subamostragem` | `RandomUnderSampler` | iguala as classes. Num fold de treino de cerca de 2.070 filmes, descarta cerca de 1.020 fracassos, metade da base, e o kNN depende de densidade |
-| `smote` | `SMOTE`, 5 vizinhos | não descarta dado, cria sucessos sintéticos interpolando entre sucessos vizinhos. Em espaço *one-hot* a interpolação gera dummies fracionárias, filmes "0,4 de uma distribuidora e 0,6 de outra" que não existem; em espaço do encoding pelo alvo ou de PCA, interpola valores contínuos |
+| sem | mantém a base como está | serve de referência |
+| subamostragem | sorteia e remove fracassos até as classes ficarem do mesmo tamanho | equilibra o voto, mas descarta cerca de 1.020 dos 2.070 filmes de cada treino; o kNN perde vizinhos e piora em regiões com poucos filmes |
+| SMOTE | cria sucessos novos entre dois sucessos parecidos, usando os 5 mais próximos | não descarta nada, mas com one-hot cria filmes impossíveis, como "metade de uma distribuidora e metade de outra"; com atributos contínuos, os filmes criados são plausíveis |
 
-**Considerados e descartados.**
-- `RandomOverSampler` duplica sucessos; para o kNN, um sucesso copiado três vezes pode
-  ocupar três dos 7 vizinhos de um filme de teste e viciar o voto em cópias.
-- `SMOTENC` trata categóricas, mas exige as colunas antes do encoding; a ordem do protocolo
-  põe o balanceamento no fim, depois da redução, por um motivo mais forte.
-- ADASYN e Tomek ficaram fora do que foi visto em sala, sem ganho de argumento que
-  justifique o custo de explicá-los.
+**Técnicas que ficaram de fora.**
+- Duplicar sucessos ao acaso: um mesmo filme copiado várias vezes pode ocupar vários dos 7
+  vizinhos de um filme de teste e decidir o voto sozinho.
+- SMOTENC, a versão do SMOTE para atributos categóricos: precisa das colunas originais,
+  mas no nosso pipeline o balanceamento vem depois do encoding e da redução.
+- ADASYN e Tomek: não foram vistos em sala e não mudariam a análise.
 
-**Hipóteses registradas antes da grade**, em `docs/e2/hipoteses-balanceamento.md`: balancear
-sobe revocação e F1 e derruba precisão e acurácia; a AUC muda pouco, provavelmente
-empate; `smote` ganha de `subamostragem` em espaço contínuo; sem normalização o SMOTE
-herda a distância distorcida. O veredito de cada uma entra na §5.2.
+**Hipóteses.** Antes de rodar a grade, registramos o que esperávamos em
+`docs/e2/hipoteses-balanceamento.md`. Em resumo: o balanceamento deve aumentar a revocação
+e o F1 e diminuir a precisão e a acurácia; a AUC deve mudar pouco; o SMOTE deve render
+mais com atributos contínuos; e sem normalização o SMOTE deve escolher vizinhos piores. A
+§5.2 compara essas expectativas com os resultados.
