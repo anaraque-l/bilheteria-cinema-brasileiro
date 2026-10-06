@@ -6,8 +6,9 @@ Como executar: python src/robustez_e2.py
 O que sai em reports/e2: uma tabela para cada checagem e uma com a
 correlacao entre os rankings. Em reports/figuras/e2 saem dois graficos.
 
-Enquanto os modulos da base e do pipeline ainda nao existem, o script usa
-versoes simplificadas e avisa no final. Os numeros dessas rodadas servem
+A base e os folds ja sao os de verdade. Enquanto alguma etapa da grade ou o
+arquivo de resultados ainda nao existe, o script usa versoes simplificadas
+deles e avisa no final. Os numeros dessas rodadas servem
 so para testar o codigo e nao entram no relatorio.
 """
 
@@ -29,13 +30,21 @@ SAIDA = RAIZ / "reports" / "e2"
 FIGURAS = RAIZ / "reports" / "figuras" / "e2"
 QUANTIS = [0.50, 0.75, 0.90]
 
+from e2.base import carregar_xy, folds
+from e2.espaco import construir_pipeline as _pipeline_da_grade
+
 PROVISORIO = False
-try:
-    from e2.base import carregar_xy, folds
-    from e2.espaco import construir_pipeline
-except ImportError:
-    PROVISORIO = True
-    from e2._provisorio import carregar_xy, construir_pipeline, folds
+
+
+def construir_pipeline(config):
+    """Usa o pipeline da grade e, se faltar alguma etapa, a versao simplificada."""
+    global PROVISORIO
+    try:
+        return _pipeline_da_grade(config)
+    except ModuleNotFoundError:
+        PROVISORIO = True
+        from e2._provisorio import construir_pipeline as simplificado
+        return simplificado(config)
 
 
 def carregar_resultados():

@@ -27,11 +27,7 @@ Opcoes que ficaram de fora:
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 
-try:
-    from e2.base import SEMENTE
-except ImportError:
-    # Enquanto o modulo da base nao existe, usamos a mesma semente do contrato.
-    SEMENTE = 42
+from e2.base import SEMENTE
 
 OPCOES = {
     "sem": lambda: "passthrough",

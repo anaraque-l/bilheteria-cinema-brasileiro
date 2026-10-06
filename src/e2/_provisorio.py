@@ -1,56 +1,25 @@
 # -*- coding: utf-8 -*-
-"""Versoes simplificadas da base, do pipeline e dos resultados.
+"""Versoes simplificadas do pipeline e dos resultados da grade.
 
-Servem para testar a robustez e o anexo antes de o modulo da Ana Raquel ficar
-pronto. Este arquivo deve ser apagado quando os modulos de verdade estiverem
-em main.
+Servem para testar a robustez e o anexo enquanto as etapas de normalizacao e
+reducao e o arquivo de resultados ainda nao existem. Este arquivo deve ser
+apagado quando a grade completa rodar.
 """
-
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from imblearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
-from sklearn.model_selection import StratifiedKFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+from e2.base import NOMINAIS, NUMERICAS, ORDINAIS, SEMENTE
 from e2.etapas.balanceamento import OPCOES as BALANCEAMENTO
 
-SEMENTE = 42
-ARQUIVO = Path(__file__).resolve().parents[2] / "data" / "processed" / "filmes.csv"
-
-# Ficam de fora os tres atributos de historico de sucesso, que so o modulo da base calcula.
-NUMERICAS = ["ano", "filmes_diretor_antes", "filmes_distribuidora_antes",
-             "filmes_produtora_antes", "coproducao", "recebeu_fsa",
-             "recebeu_incentivo", "contratos_fsa", "projetos_incentivo"]
-CATEGORICAS = ["genero", "uf_maj", "distribuidora", "origem_do_fomento",
-               "experiencia_da_direcao", "porte_da_distribuidora"]
-
-
-def carregar_xy(quantil=0.75):
-    """Le a base e marca como sucesso o filme que superou o corte do ano anterior.
-
-    O corte e um percentil do publico dos filmes lancados no ano anterior.
-    Filmes do primeiro ano da base ficam de fora porque nao tem ano anterior.
-    """
-    d = pd.read_csv(ARQUIVO)
-    d = d[d["publico"].notna()]
-    corte = d.groupby("ano")["publico"].quantile(quantil)
-    d = d.assign(corte=d["ano"].map(lambda a: corte.get(a - 1, np.nan)))
-    d = d[d["corte"].notna()].reset_index(drop=True)
-    y = (d["publico"] > d["corte"]).astype(int)
-    return d[NUMERICAS + CATEGORICAS], y, d["ano"]
-
-
-def folds():
-    """Divide a base em 5 partes com a mesma proporcao de sucessos."""
-    X, y, _ = carregar_xy()
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEMENTE)
-    return list(cv.split(X, y))
+# O pipeline simplificado trata as ordinais como nominais, o que basta para testar.
+CATEGORICAS = NOMINAIS + ORDINAIS
 
 
 def construir_pipeline(config):
