@@ -22,7 +22,7 @@ from e2.etapas.balanceamento import OPCOES as BALANCEAMENTO
 SEMENTE = 42
 ARQUIVO = Path(__file__).resolve().parents[2] / "data" / "processed" / "filmes.csv"
 
-# Sem os hist_*, que sao calculados em base.py.
+# Sem os atributos de historico de sucesso, que o base.py calcula.
 NUMERICAS = ["ano", "filmes_diretor_antes", "filmes_distribuidora_antes",
              "filmes_produtora_antes", "coproducao", "recebeu_fsa",
              "recebeu_incentivo", "contratos_fsa", "projetos_incentivo"]
