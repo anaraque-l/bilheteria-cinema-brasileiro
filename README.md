@@ -158,22 +158,22 @@ Cada hipótese de pré-processamento foi transformada em número por
 
 ---
 
-## Entrega 2 — Pré-processamento e *pipelines*
+## Entrega 2: pré-processamento e pipelines
 
-Mesma base, outra pergunta: **como cada etapa de preparação dos dados muda o
-desempenho de um kNN com k = 7 fixo?** São 144 combinações de pré-processamento,
-avaliadas com o mesmo 5-fold estratificado.
+Mesma base, outra pergunta: quanto cada etapa de preparação dos dados muda o desempenho
+de um kNN com k = 7 fixo. São 144 combinações de pré-processamento, avaliadas com o mesmo
+5-fold estratificado.
 
-**O alvo mudou, como a Entrega 1 recomendou:** sucesso passa a ser público acima do
-**percentil 75 dos filmes brasileiros do ano anterior** — um limiar conhecido antes da
-estreia e próximo da fronteira entre as duas populações de público. São 2.590 filmes,
-25,3% deles sucesso. Entram também três atributos de **histórico de sucesso** da direção,
-da distribuidora e da produtora, calculados só com anos anteriores.
+O alvo mudou, seguindo a recomendação da Entrega 1: sucesso passa a ser público acima do
+percentil 75 dos filmes brasileiros do ano anterior, um limiar conhecido antes da estreia
+e próximo da fronteira entre as duas populações de público. São 2.590 filmes, 25,3% deles
+sucesso. Entram também três atributos de histórico de sucesso da direção, da distribuidora
+e da produtora, calculados só com anos anteriores.
 
 | etapa | opções |
 |---|---|
 | valores ausentes | mediana e moda · mediana com indicadora de ausência |
-| encoding | *one-hot* com agrupamento de raras · encoding pelo alvo |
+| encoding | one-hot com agrupamento de raras · encoding pelo alvo |
 | normalização | sem · z-score · min-max · robusta |
 | redução | sem · PCA · seleção das 10 melhores por informação mútua |
 | balanceamento | sem · subamostragem · SMOTE |
