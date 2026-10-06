@@ -10,6 +10,7 @@ O QUE MUDA EM RELACAO A E1
 build_dataset.py nao e alterado: ele e o entregavel congelado da E1.
 """
 
+import json
 import sys
 from functools import lru_cache
 from pathlib import Path
@@ -167,19 +168,54 @@ def coincidencia_da_ausencia():
     return pd.DataFrame(linhas)
 
 
-def resumo():
+def descrever(gravar=False):
+    """Os numeros que a secao 2 do relatorio cita, em arquivo.
+
+    A regra do grupo e que nenhum numero do relatorio seja digitado a mao.
+    Entao o que a secao afirma sobre tamanho da base, prevalencia e ausencia
+    sai daqui, e nao da tela.
+    """
     X, y, ano = carregar_xy()
-    decada = (ano // 10 * 10)
-    print("filmes com alvo: %d" % len(y))
-    print("prevalencia de sucesso: %.3f" % y.mean())
-    print("por decada: %s" % y.groupby(decada).mean().round(3).to_dict())
-    print("ausencia por atributo, em %:")
+    por_decada = y.groupby(ano // 10 * 10).mean().round(3)
     falta = (X.isna().mean() * 100).round(2)
+    ausencia = coincidencia_da_ausencia().round(2)
+
+    descricao = {
+        "filmes_com_alvo": int(len(y)),
+        "filmes_sem_alvo": int(len(bd.carregar()) - len(y)),
+        "prevalencia_sucesso": round(float(y.mean()), 4),
+        "prevalencia_por_decada": {str(k): float(v) for k, v in por_decada.items()},
+        "quantil_do_alvo": 0.75,
+        "n_atributos": len(ATRIBUTOS),
+        "n_numericas": len(NUMERICAS),
+        "n_nominais": len(NOMINAIS),
+        "n_ordinais": len(ORDINAIS),
+        "maior_ausencia_fora_do_historico_%": float(
+            falta.drop(index=list(HISTORICOS), errors="ignore").max()),
+        "historico_nao_vaza": checar_nao_vazamento(),
+    }
+    if gravar:
+        SAIDA.mkdir(parents=True, exist_ok=True)
+        (SAIDA / "base_descricao.json").write_text(
+            json.dumps(descricao, indent=2, ensure_ascii=False), encoding="utf-8")
+        falta[falta > 0].rename("ausente_%").to_csv(SAIDA / "base_ausencia.csv")
+        ausencia.to_csv(SAIDA / "base_ausencia_estrutural.csv", index=False)
+    return descricao, falta, ausencia
+
+
+def resumo():
+    descricao, falta, ausencia = descrever(gravar=True)
+    print("filmes com alvo: %d" % descricao["filmes_com_alvo"])
+    print("prevalencia de sucesso: %.3f" % descricao["prevalencia_sucesso"])
+    print("por decada: %s" % descricao["prevalencia_por_decada"])
+    print("ausencia por atributo, em %:")
     print(falta[falta > 0].to_string())
-    print(coincidencia_da_ausencia().round(2).to_string(index=False))
-    print("teste de nao vazamento do historico: %s" % checar_nao_vazamento())
+    print(ausencia.to_string(index=False))
+    print("teste de nao vazamento do historico: %s" % descricao["historico_nao_vaza"])
     folds(gravar=True)
-    print("folds gravados em %s" % (SAIDA / "folds.csv").relative_to(RAIZ).as_posix())
+    for nome in ("base_descricao.json", "base_ausencia.csv",
+                 "base_ausencia_estrutural.csv", "folds.csv"):
+        print("gravado: %s" % (SAIDA / nome).relative_to(RAIZ).as_posix())
 
 
 if __name__ == "__main__":
