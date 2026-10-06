@@ -1,15 +1,27 @@
 # -*- coding: utf-8 -*-
-"""Etapa de balanceamento, a ultima antes do kNN.
+"""Balanceamento: igualar sucessos e fracassos antes de o kNN votar.
 
-Os samplers do imbalanced-learn so agem no fit do Pipeline, entao o fold de
-teste nunca e reamostrado. E por isso que a dependencia existe.
+Para que serve. Na base ha tres fracassos para cada sucesso. O kNN decide
+pelo voto dos 7 vizinhos mais proximos, entao na maioria dos bairros os
+fracassos ganham a votacao e o modelo quase nao preve sucesso. Mudar a
+proporcao das classes no treino e a unica forma de mexer nesse voto, porque
+o kNN nao aceita peso por classe.
 
-Considerados e descartados:
-  RandomOverSampler duplica sucessos, e uma copia repetida pode ocupar varios
-  dos 7 vizinhos de um filme de teste, viciando o voto.
-  SMOTENC exige as colunas antes do encoding, e a ordem do grupo poe o
-  balanceamento depois da reducao, para que PCA e selecao vejam so filmes reais.
-  ADASYN e Tomek ficaram fora do que foi visto em sala, sem ganho de argumento.
+Por que nao contamina o teste. A biblioteca imbalanced-learn so reamostra
+durante o treino do pipeline. Na hora de avaliar, os filmes de teste passam
+direto, sem nenhum filme removido ou inventado.
+
+As tres opcoes:
+  - sem: deixa a base como esta e serve de referencia;
+  - subamostragem: sorteia e remove fracassos ate igualar as classes;
+  - smote: cria sucessos novos no meio do caminho entre dois sucessos parecidos.
+
+Opcoes que ficaram de fora:
+  - duplicar sucessos: um filme copiado varias vezes pode ocupar varios dos 7
+    vizinhos de um filme de teste e decidir o voto sozinho;
+  - SMOTENC: precisa das colunas categoricas originais, mas aqui o
+    balanceamento vem depois do encoding e da reducao;
+  - ADASYN e Tomek: nao foram vistos em sala e nao mudariam o argumento.
 """
 
 from imblearn.over_sampling import SMOTE
@@ -18,13 +30,14 @@ from imblearn.under_sampling import RandomUnderSampler
 try:
     from e2.base import SEMENTE
 except ImportError:
-    # Enquanto base.py nao chega a main; o valor e o mesmo do contrato.
+    # Enquanto o modulo da base nao existe, usamos a mesma semente do contrato.
     SEMENTE = 42
 
 OPCOES = {
     "sem": lambda: "passthrough",
     "subamostragem": lambda: RandomUnderSampler(random_state=SEMENTE),
-    # Cinco vizinhos e o padrao da biblioteca e cabe folgado nos ~520 sucessos de cada fold de treino.
+    # O SMOTE escolhe entre os 5 sucessos mais parecidos para criar cada filme novo.
+    # E o valor padrao e cabe com folga nos cerca de 520 sucessos de cada treino.
     "smote": lambda: SMOTE(k_neighbors=5, random_state=SEMENTE),
 }
 

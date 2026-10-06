@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
-"""Metricas da Entrega 2, iguais para as 144 combinacoes.
+"""Como medimos o acerto das 144 combinacoes.
 
-Classe positiva e sucesso igual a 1. Com 25,3% de positivos, quem responde
-sempre fracasso acerta 0,747 e tem F1 zero, entao a acuracia nao ranqueia
-nada. A AUC mede se o modelo ordena bem os filmes, sem depender de limiar.
-F1, precisao e revocacao medem o que acontece no limiar padrao de 0,5, que
-num kNN com k igual a 7 quer dizer pelo menos 4 dos 7 vizinhos de sucesso.
-A average_precision entra como complemento por ser sensivel a prevalencia.
+O filme de sucesso e a classe positiva. Como so um em cada quatro filmes e
+sucesso, um modelo que chuta sempre fracasso ja acerta 74,7% das vezes sem
+ter aprendido nada. Por isso a acuracia sozinha engana neste problema.
+
+As metricas se dividem em duas familias:
+  - a AUC olha se o modelo coloca os sucessos acima dos fracassos quando
+    ordena os filmes, sem precisar escolher um ponto de corte;
+  - F1, precisao e revocacao olham a decisao final do modelo. No kNN com
+    7 vizinhos, o filme e previsto como sucesso quando pelo menos 4 dos 7
+    vizinhos sao sucesso.
+
+A precisao media completa o quadro porque leva em conta quantos positivos
+existem na base.
 """
 
 SCORING = {
@@ -18,6 +25,7 @@ SCORING = {
     "average_precision": "average_precision",
 }
 
-# Desempate de ranking: a AUC nao depende de limiar e e a mesma da Entrega 1.
+# A AUC ordena as combinacoes porque nao depende do ponto de corte e e a mesma
+# metrica da Entrega 1. O F1 vem logo atras porque e onde o balanceamento aparece.
 PRINCIPAL = "roc_auc"
 CO_PRINCIPAL = "f1"

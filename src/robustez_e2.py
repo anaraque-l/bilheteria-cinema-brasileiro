@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-"""Roda a robustez da Entrega 2 e grava reports/e2/robustez_*.csv e as figuras fig-lf-*.
+"""Roda as tres checagens de robustez e salva tabelas e figuras.
 
-Executar: python src/robustez_e2.py
+Como executar: python src/robustez_e2.py
 
-Enquanto base.py, espaco.py e resultados.csv nao chegam a main, o script usa
-substitutos locais marcados como provisorios, e avisa na saida. Nenhum numero
-de uma rodada provisoria vai para o relatorio.
+O que sai em reports/e2: uma tabela para cada checagem e uma com a
+correlacao entre os rankings. Em reports/figuras/e2 saem dois graficos.
+
+Enquanto os modulos da base e do pipeline ainda nao existem, o script usa
+versoes simplificadas e avisa no final. Os numeros dessas rodadas servem
+so para testar o codigo e nao entram no relatorio.
 """
 
 import sys
@@ -36,6 +39,7 @@ except ImportError:
 
 
 def carregar_resultados():
+    """Le os resultados da grade, ou usa numeros de teste se eles ainda nao existem."""
     caminho = SAIDA / "resultados.csv"
     if caminho.exists():
         return pd.read_csv(caminho)
@@ -46,6 +50,7 @@ def carregar_resultados():
 
 
 def main():
+    """Roda as tres checagens para cada combinacao escolhida e grava tudo."""
     warnings.filterwarnings("ignore")
     SAIDA.mkdir(parents=True, exist_ok=True)
     FIGURAS.mkdir(parents=True, exist_ok=True)
@@ -86,6 +91,10 @@ def main():
 
 
 def figura_limiar(lim):
+    """Uma linha por combinacao mostrando sua posicao no ranking em P50, P75 e P90.
+
+    Linhas retas indicam que a posicao nao muda com o corte.
+    """
     rank = (lim.groupby(["quantil", "id"])[PRINCIPAL].mean()
                .groupby(level=0).rank(ascending=False).unstack(0))
     fig, ax = plt.subplots(figsize=(6, 4.5))
@@ -103,6 +112,11 @@ def figura_limiar(lim):
 
 
 def figura_temporal(temp):
+    """Compara a AUC do 5-fold com a AUC da validacao temporal.
+
+    Pontos abaixo da diagonal indicam que o 5-fold mostrou um resultado
+    melhor do que o modelo teria prevendo o futuro.
+    """
     fig, ax = plt.subplots(figsize=(5, 5))
     ax.scatter(temp["roc_auc_5fold"], temp["roc_auc"], color="0.2")
     for _, r in temp.iterrows():

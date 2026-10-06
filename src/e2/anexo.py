@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Tabela completa do anexo: as 144 combinacoes, uma linha cada, por id.
+"""Monta a tabela do anexo com as 144 combinacoes.
 
-Executar: python src/e2/anexo.py
+Como executar: python src/e2/anexo.py
 
-Gera Markdown para o relatorio e CSV ja formatado, que entra no docx sem
-copiar e colar a mao, porque tabela colada e tabela quebrada.
+Cada linha e uma combinacao, em ordem de id, com as opcoes de cada etapa,
+media e desvio de cada metrica, numero de atributos, tempo e erro. Sai em
+Markdown para o relatorio e em CSV para importar no Word sem digitar nada.
 """
 
 import sys
@@ -18,15 +19,18 @@ from e2.metricas import SCORING
 RAIZ = Path(__file__).resolve().parents[2]
 SAIDA = RAIZ / "reports" / "e2"
 ETAPAS = ["ausentes", "encoding", "normalizacao", "reducao", "balanceamento"]
-# Virgula decimal, como no texto do relatorio.
 ROTULO = {"accuracy": "acurácia", "f1": "F1", "precision": "precisão",
           "recall": "revocação", "roc_auc": "AUC", "average_precision": "AP"}
 
 
 def tabela(resultados):
+    """Formata os resultados da grade como texto pronto para o anexo.
+
+    Os numeros saem com virgula decimal, como no resto do relatorio.
+    """
     r = resultados.sort_values("id")
     t = pd.DataFrame({"id": r["id"].astype(int).astype(str)})
-    # O baseline e marcado no proprio id para nao gastar uma coluna inteira.
+    # O baseline e marcado ao lado do id, assim a tabela nao ganha uma coluna so para isso.
     t.loc[r["eh_baseline"].to_numpy() == 1, "id"] += " (base)"
     for e in ETAPAS:
         t[e] = r[e].to_numpy()
@@ -41,6 +45,7 @@ def tabela(resultados):
 
 
 def para_markdown(t):
+    """Converte a tabela em texto Markdown."""
     linhas = ["| " + " | ".join(t.columns) + " |",
               "|" + "---|" * len(t.columns)]
     linhas += ["| " + " | ".join(str(v).replace("|", "\\|") for v in row) + " |"
@@ -49,6 +54,7 @@ def para_markdown(t):
 
 
 def main(caminho=SAIDA / "resultados.csv"):
+    """Le os resultados, monta a tabela e grava as duas versoes."""
     resultados = pd.read_csv(caminho, keep_default_na=True)
     t = tabela(resultados)
     SAIDA.mkdir(parents=True, exist_ok=True)

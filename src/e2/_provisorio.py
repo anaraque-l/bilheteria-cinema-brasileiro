@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Substitutos locais de base.py, espaco.py e resultados.csv.
+"""Versoes simplificadas da base, do pipeline e dos resultados.
 
-Existem so para a robustez e o anexo andarem antes do motor da Ana Raquel.
-Apagar quando base.py, espaco.py e resultados.csv estiverem em main.
+Servem para testar a robustez e o anexo antes de o modulo da Ana Raquel ficar
+pronto. Este arquivo deve ser apagado quando os modulos de verdade estiverem
+em main.
 """
 
 from pathlib import Path
@@ -22,7 +23,7 @@ from e2.etapas.balanceamento import OPCOES as BALANCEAMENTO
 SEMENTE = 42
 ARQUIVO = Path(__file__).resolve().parents[2] / "data" / "processed" / "filmes.csv"
 
-# Sem os atributos de historico de sucesso, que o base.py calcula.
+# Ficam de fora os tres atributos de historico de sucesso, que so o modulo da base calcula.
 NUMERICAS = ["ano", "filmes_diretor_antes", "filmes_distribuidora_antes",
              "filmes_produtora_antes", "coproducao", "recebeu_fsa",
              "recebeu_incentivo", "contratos_fsa", "projetos_incentivo"]
@@ -31,7 +32,11 @@ CATEGORICAS = ["genero", "uf_maj", "distribuidora", "origem_do_fomento",
 
 
 def carregar_xy(quantil=0.75):
-    """Alvo de D-E2-1: publico acima do quantil dos filmes do ano anterior."""
+    """Le a base e marca como sucesso o filme que superou o corte do ano anterior.
+
+    O corte e um percentil do publico dos filmes lancados no ano anterior.
+    Filmes do primeiro ano da base ficam de fora porque nao tem ano anterior.
+    """
     d = pd.read_csv(ARQUIVO)
     d = d[d["publico"].notna()]
     corte = d.groupby("ano")["publico"].quantile(quantil)
@@ -42,13 +47,14 @@ def carregar_xy(quantil=0.75):
 
 
 def folds():
+    """Divide a base em 5 partes com a mesma proporcao de sucessos."""
     X, y, _ = carregar_xy()
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEMENTE)
     return list(cv.split(X, y))
 
 
 def construir_pipeline(config):
-    """Pipeline minimo: so a etapa de balanceamento segue a configuracao."""
+    """Monta um pipeline simples em que so o balanceamento varia."""
     pre = ColumnTransformer([
         ("num", SimpleImputer(strategy="median"), NUMERICAS),
         ("cat", make_pipeline(SimpleImputer(strategy="most_frequent"),
@@ -60,7 +66,7 @@ def construir_pipeline(config):
 
 
 def resultados_sinteticos():
-    """CSV no formato A.6 com numeros aleatorios, so para testar o encanamento."""
+    """Gera resultados aleatorios no mesmo formato da grade, so para testar o codigo."""
     import itertools
     opcoes = [["mediana_moda", "mediana_indicadora"], ["onehot", "alvo"],
               ["sem", "padrao", "minmax", "robusto"], ["sem", "pca", "kbest"],
