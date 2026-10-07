@@ -165,19 +165,19 @@ Leitura por família:
 inegavelmente sucesso) e **agravam** o problema temporal: `global_P90` marca 16,3% dos anos
 1990 e 2,6% dos anos 2020. Trocar P50 por P90 sem sair do global é trocar de doença.
 
-**C. Quartis.** Q3 é a alternativa mais interessante e está discutida na seção 12. Q1 não faz
+**B. Quartis.** Q3 é a alternativa mais interessante e está discutida na seção 12. Q1 não faz
 sentido ("sucesso = melhor que os 25% piores" seria ainda mais permissivo que a mediana).
 
-**D. Período em vez de ano.** A janela móvel de 5 anos (`janela5a_P75`) estabiliza o corte em
+**C. Período em vez de ano.** A janela móvel de 5 anos (`janela5a_P75`) estabiliza o corte em
 anos de poucos filmes e concorda 90% com `ano_P75` (κ = 0,90). É defensável, mas custa
 interpretabilidade ("percentil 75 da vizinhança de cinco anos" não cabe numa frase) e
 introduz olhar-para-o-futuro (usa *t*+1 e *t*+2).
 
-**E. Normalização pelo tamanho do mercado.** **A base não sustenta.** Duas evidências:
+**D. Normalização pelo tamanho do mercado.** **A base não sustenta.** Duas evidências:
 - Dividir o público pela população brasileira é inútil: a população cresceu ~1,3x no período
   enquanto o público mediano caiu ~15x. O alvo resultante é indistinguível do original
   (**κ = 0,98**, apenas 0,9% dos filmes mudam de classe).
-- Pior: a série do IBGE (agregado 6579) **não cobre 9 dos 30 anos** — 1995–2000, 2007, 2010,
+- Pior: a série do IBGE (agregado 6579) **não cobre 10 dos 30 anos** — 1995–2000, 2007, 2010,
   2022 e 2023 ficam sem `populacao_br`. Qualquer alvo per capita seria indefinido para ~1/3
   do período.
 - O que faltaria de verdade é o **público total do mercado brasileiro por ano** (incluindo
@@ -185,12 +185,13 @@ introduz olhar-para-o-futuro (usa *t*+1 e *t*+2).
   aproximação disponível — fatia do público *brasileiro* do ano — produz classes de 3,3%
   (87 filmes) e κ = 0,07 com o alvo atual: é outra pergunta, não outra medida da mesma.
 
-**F. Critério de negócio.** O ideal seria **retorno**: público ou receita contra orçamento.
+**E. Critério de negócio.** O ideal seria **retorno**: público ou receita contra orçamento.
 A base **não tem orçamento** (decisão D1: só fontes sem credencial) — e sem ele não existe
 "lucro", "ROI" nem "se pagou". Não vamos inventar uma métrica que os dados não sustentam.
 O que a base tem de utilizável nessa direção:
-- `renda_deflacionada_2024`: correlação de Spearman **0,985** com público — é a mesma
-  variável em outra unidade (preço mediano do ingresso: R$ 11,16, faixa R$ 1,39–31,43).
+- `renda_deflacionada_2024`: correlação de Spearman **0,994** com público (0,985 na renda
+  corrente) — é a mesma variável em outra unidade (preço mediano do ingresso, na renda
+  corrente: R$ 11,16, faixa R$ 1,39–31,43).
   Não acrescenta informação, e é posterior ao lançamento (D5).
 - `max_salas`: ρ = 0,79 com público, mas é o **máximo da carreira**, contaminado pelo
   desempenho (D6). Serve como *descrição* de escala de lançamento, não como alvo nem como
@@ -370,7 +371,8 @@ nossa, e escolhas igualmente defensáveis discordam sobre até 40% dos filmes.
 | As variáveis que constroem o alvo são independentes dos preditores? | Só depois de excluir `renda` e `max_salas` (D5/D6). |
 | Há risco de vazamento? | **Sim, em quatro pontos.** |
 
-**V1 — `renda_corrente` / `renda_deflacionada_2024`.** ρ de Spearman com público = **0,985**.
+**V1 — `renda_corrente` / `renda_deflacionada_2024`.** ρ de Spearman com público = **0,985**
+e **0,994**.
 É o alvo em outra unidade. Já tratado por D5. *Nunca* como atributo.
 
 **V2 — `max_salas`.** ρ = 0,79. É o máximo da carreira, e distribuidora amplia filme que vai
@@ -389,8 +391,8 @@ uma contagem fechada no fim do ano. Nenhum dos dois é observável no momento da
 
 Custo de corrigir V4, medido: usar o percentil do **ano anterior** (conhecido, publicado, e
 não contaminado pelo próprio filme) troca a classe de apenas **9,2%** dos filmes em relação à
-mediana do ano corrente (κ = 0,82) e custa 0,03 de AUC (0,774 → 0,743). **É barato e elimina uma
-objeção que a professora tem todo direito de levantar.**
+mediana do ano corrente (κ = 0,82) e custa 0,03 de AUC (0,774 → 0,743). **É barato e elimina
+essa objeção.**
 
 Utilidade preditiva de cada alvo, com atributos só pré-estreia e partição temporal
 (treino ≤ 2017, teste ≥ 2018) — `reports/alvo_utilidade_preditiva.csv`:
@@ -402,7 +404,7 @@ Utilidade preditiva de cada alvo, com atributos só pré-estreia e partição te
 | **`ano_P75`** | **0,774** | 25,2 | 25,0 | **0,2** |
 | `ano_P90` | 0,828 | 10,6 | 10,2 | 0,3 |
 | `anoANTERIOR_P75` | 0,743 | 25,0 | 25,7 | 0,7 |
-| `abs_100k` | 0,876 | 19,3 | 5,7 | 13,6 |
+| `abs_100k` | 0,883 | 19,3 | 5,7 | 13,6 |
 
 Duas advertências sobre esta tabela: (a) AUC não é comparável entre alvos diferentes — cortes
 extremos separam grupos mais distantes e sobem o AUC quase automaticamente, então **não use
@@ -537,12 +539,9 @@ Só R5 toca em código, e é uma lista de exclusão — não muda a base.
 
 ---
 
-## 13. Pensando como a professora
+## 13. Perguntas prováveis
 
-**A primeira pergunta será: "Por que acima da mediana significa sucesso?"** E a segunda,
-inevitável: *"Então metade dos filmes brasileiros é um sucesso?"*
-
-Perguntas prováveis, e a resposta curta de cada uma:
+As perguntas que esta auditoria precisa responder na apresentação, com a resposta curta:
 
 | pergunta | resposta |
 |---|---|
@@ -555,27 +554,6 @@ Perguntas prováveis, e a resposta curta de cada uma:
 | "E a pandemia?" | 2020 é quebra estrutural (−99,5% de público). O alvo relativo absorve; a análise de sensibilidade mostra quanto. |
 | "Por que não regressão?" | A cauda domina (Gini 0,92; 1% dos filmes = 36% do público). Registramos regressão em log como extensão. |
 | "Esse alvo é só gênero disfarçado?" | Risco real: com Q3, só 6,2% dos documentários são positivos. Precisa ser reportado, e o modelo avaliado também dentro de cada gênero. |
-
-**A resposta de 10 minutos — "por que acima da mediana significa sucesso?":**
-
-> "Não significa. Foi o que descobrimos ao auditar nosso próprio alvo.
-> A mediana parecia boa porque dá classes equilibradas — mas esse equilíbrio é aritmética, não
-> achado: cortar na mediana devolve 50/50 em qualquer distribuição. E o público brasileiro não
-> é uma distribuição qualquer: 1% dos filmes concentra 36% do público e a metade inferior fica
-> com 0,28%. Numa distribuição dessas, dizer que metade dos filmes é sucesso contraria os
-> próprios dados.
-> Então perguntamos onde os dados colocariam o corte. O público, em escala logarítmica, é uma
-> mistura de duas populações: filmes de circuito limitado, em torno de 900 espectadores, e
-> lançamentos comerciais, em torno de 51 mil. A fronteira entre as duas cai no percentil 69 —
-> e a mediana cai dentro da primeira. Ou seja, nosso corte antigo separava circuito limitado
-> bom de circuito limitado ruim.
-> Nossa proposta é o quartil superior da safra do ano anterior. Quartil superior porque é o
-> quantil que corresponde à fronteira entre as duas populações; do ano anterior porque é o
-> único limiar que existe antes da estreia. Isso dá cortes que fazem sentido para quem é do
-> mercado: 155 mil espectadores em 1995, 5,3 mil em 2024.
-> E fomos honestas sobre o preço: mudar de mediana para quartil superior reclassifica um
-> quarto dos filmes. Por isso vamos reportar o resultado nos três cortes — P50, P75 e P90.
-> Se a conclusão sobrevive aos três, é conclusão; se só existe em um, é artefato da definição."
 
 ---
 

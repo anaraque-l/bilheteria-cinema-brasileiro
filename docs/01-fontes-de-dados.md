@@ -19,7 +19,7 @@ https://www.gov.br/ancine/pt-br/oca/cinema/arquivos.csv/
 listagem-de-filmes-brasileiros-lancados-1995-a-2024r.csv/@@download/file
 ```
 
-> ⚠️ **O sufixo `/@@download/file` é obrigatório.** O portal roda Plone: sem ele, o
+> **O sufixo `/@@download/file` é obrigatório.** O portal roda Plone: sem ele, o
 > servidor responde **HTTP 200 com a página HTML do arquivo** (~323 KB), não o CSV.
 > O pandas lê o HTML e falha com erro de parsing que não aponta para a causa.
 > `ingestao.py` detecta e falha explicitamente.
@@ -100,13 +100,13 @@ catálogo — mais explícita que o arcabouço geral da LAI que rege as outras f
 **Cobertura da junção.** Por CPB, casam com **67,1%** dos 2.612 filmes com CPB válido:
 31,2% têm FSA, 54,1% têm incentivo.
 
-> ⚠️ **Estes arquivos não estão no portal do OCA, e o host não é o gov.br.** O catálogo
+> **Estes arquivos não estão no portal do OCA, e o host não é o gov.br.** O catálogo
 > `dados.gov.br` é uma aplicação de página única: o HTML cru não traz URL de arquivo, e
 > a API devolve **HTTP 401** para cliente externo. Renderizada num navegador, a mesma
 > API responde 200 e o campo `resources[].url` aponta para **`dados.ancine.gov.br`** —
 > um domínio separado que não é linkado de lugar nenhum.
 
-> ⚠️ **Agregue por CPB antes de juntar.** Uma obra aparece uma vez por contrato ou
+> **Agregue por CPB antes de juntar.** Uma obra aparece uma vez por contrato ou
 > projeto aprovado; a junção crua multiplicaria linhas de filme.
 
 **O que estes arquivos NÃO têm: valor.** Só o número do instrumento. Dá para derivar
@@ -132,7 +132,7 @@ catálogo — mais explícita que o arcabouço geral da LAI que rege as outras f
 O deflator **não é atributo do modelo** — serve para tornar a renda legível na EDA.
 (E a renda em si é vazamento; ver `02-decisoes-e-escopo.md`, D5.)
 
-> ⚠️ Passar `dataInicial`/`dataFinal` nesta série devolveu erro nos testes. Baixe a
+> Passar `dataInicial`/`dataFinal` nesta série devolveu erro nos testes. Baixe a
 > série inteira e filtre em memória.
 
 ---
@@ -152,7 +152,7 @@ ausência em `populacao_br`, que é falta de **junção**, não do dado original
 **Uso.** Contexto de mercado: mostrar que o crescimento do público do cinema nacional
 não é só crescimento populacional.
 
-> ⚠️ `apisidra.ibge.gov.br` **não resolve DNS** neste ambiente. Use `servicodados`.
+> `apisidra.ibge.gov.br` **não resolve DNS** neste ambiente. Use `servicodados`.
 
 ---
 

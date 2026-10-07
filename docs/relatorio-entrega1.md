@@ -29,8 +29,7 @@ sem valor. Medimos cada um:
 | validar com *k-fold* aleatório em vez de partição temporal | **+0,087** |
 
 Somados a uma definição de alvo que embute o ano de lançamento, o caminho fácil entrega
-**AUC 0,995** e o caminho honesto entrega **0,725**. **0,27 de AUC** separa as duas
-versões, e nenhuma linha de código as distingue à primeira vista.
+**AUC 0,995** e o caminho honesto entrega **0,725**, uma diferença de 0,27.
 
 E há um quarto atalho, que não é de atributo nem de validação, e sim **da própria
 definição de sucesso**. Auditamos nosso alvo (§2.9 e `docs/04-auditoria-do-alvo.md`) e o
@@ -73,7 +72,7 @@ o catálogo `dados.gov.br` é uma aplicação de página única cuja API devolve
 cliente externo; renderizada num navegador, a mesma API responde 200 e revela o host
 real, **`dados.ancine.gov.br`**, que não é linkado de lugar nenhum.
 
-**Coleta.** `src/ingestao.py` baixa os três arquivos usando apenas a biblioteca padrão
+**Coleta.** `src/ingestao.py` baixa os cinco arquivos usando apenas a biblioteca padrão
 do Python e grava em `data/raw/` **sem transformar nada**. O bruto é versionado no
 repositório: órgão público republica arquivo sem avisar — a própria edição `2024r` é uma
 retificação da `2024` — e versionar é o que garante que outra pessoa reproduza *os
@@ -188,7 +187,7 @@ A concentração é extrema:
 > classes equilibradas, **esconde** essa assimetria do alvo — bom para o treino,
 > perigoso para a interpretação.
 
-📊 `reports/figuras/fig01-distribuicao-publico.png`
+Figura: `reports/figuras/fig01-distribuicao-publico.png`
 
 ### 2.2 O mercado mudou de natureza
 
@@ -210,7 +209,7 @@ A pandemia (2020–2021) aparece como choque real na série, não como ruído.
 > grandeza maior que o de 2024, um corte pela mediana **global** classifica quase todo
 > filme antigo como sucesso e quase todo filme recente como fracasso.
 
-📊 `reports/figuras/fig02-evolucao-anual.png` · `fig06-salas-e-decada.png`
+Figura: `reports/figuras/fig02-evolucao-anual.png` · `fig06-salas-e-decada.png`
 
 ### 2.3 Categóricas: cardinalidade e concentração, os dois extremos
 
@@ -231,7 +230,7 @@ indicadores individuais, ou seja, memorização disfarçada de atributo.
 Há ainda **entidade fragmentada**: `Downtown` (65 filmes), `Paris` (59) e
 `Downtown/Paris` (92) são três categorias para as mesmas empresas em arranjos diferentes.
 
-📊 `reports/figuras/fig03-categoricas.png`
+Figura: `reports/figuras/fig03-categoricas.png`
 
 ### 2.4 Fomento público: o gradiente, e a inversão
 
@@ -256,12 +255,12 @@ seleciona filmes acima da mediana do seu ano, mas cuja mediana absoluta é baixa
 mecanismo que financia muito documentário e produção de circuito limitado. Não é crítica
 ao FSA: é descrição do que ele financia.
 
-> ⚠️ **Confundimento temporal.** O FSA foi criado em **2006**: a cobertura é 0,0% nos
+> **Confundimento temporal.** O FSA foi criado em **2006**: a cobertura é 0,0% nos
 > anos 1990 e 63,3% nos anos 2020, e `recebeu_fsa` tem **ρ = 0,511 com `ano`**. Isso não
 > o invalida — dentro dos anos 2010 isoladamente o gradiente se mantém (80,4% contra
 > 28,7%) — mas obriga a manter `ano` no modelo. É a hipótese **H14**.
 
-📊 `reports/figuras/fig09-fomento.png`
+Figura: `reports/figuras/fig09-fomento.png`
 
 ### 2.5 Gênero informa, mas não determina
 
@@ -272,7 +271,7 @@ menos de um terço dos documentários.
 As caixas, porém, **se sobrepõem amplamente**: existem documentários com centenas de
 milhares de espectadores e ficções com dezenas.
 
-📊 `reports/figuras/fig04-publico-por-genero.png`
+Figura: `reports/figuras/fig04-publico-por-genero.png`
 
 ### 2.6 Relação de cada atributo com a variável-alvo
 
@@ -290,7 +289,7 @@ as numéricas, **V de Cramér** para as categóricas.
 | `filmes_no_ano` | **+0,003** | | `coproducao` | 0,135 |
 | **`ano`** | **+0,002** | | | |
 
-**Este quadro fecha o argumento central do relatório.** `ano` tem correlação de
+**Este quadro sustenta o argumento central do relatório.** `ano` tem correlação de
 **+0,002** com o alvo, e `filmes_no_ano` de +0,003 — praticamente zero.
 
 Com `sucesso_global`, o ano seria um dos atributos mais preditivos da base, porque a
@@ -310,7 +309,7 @@ apareceria num heatmap de Spearman, que não opera sobre categórica nominal.
 > numéricas nesta base — é onde está o sinal. Reforça **H4** e explica **H13**: o
 > gargalo de dimensionalidade é categórico, não numérico.
 
-📊 `reports/figuras/fig10-correlacao-com-alvo.png`
+Figura: `reports/figuras/fig10-correlacao-com-alvo.png`
 
 ### 2.7 Os atributos ordinais e a dimensão regional
 
@@ -336,11 +335,11 @@ continua informativa, mas avisa que "grande" não significa o que o senso comum 
 **Pernambuco aparece em segundo**, à frente de São Paulo — com 92 filmes, não é ruído de
 amostra pequena, e é consistente com o que se sabe do setor sobre a produção pernambucana.
 
-> ⚠️ **Associação, não causalidade.** `uf_maj` é o endereço fiscal da produtora
+> **Associação, não causalidade.** `uf_maj` é o endereço fiscal da produtora
 > majoritária, não onde o filme foi rodado nem onde foi visto — e está confundida com
 > gênero e com acesso a fomento.
 
-📊 `reports/figuras/fig11-ordinais-e-regiao.png`
+Figura: `reports/figuras/fig11-ordinais-e-regiao.png`
 
 ### 2.8 Relações entre variáveis
 
@@ -360,7 +359,7 @@ Fora esses blocos, as correlações com o público são modestas: histórico da 
 atributo honesto sozinho explica o sucesso** — o que é esperado e é o que dá sentido a
 usar um modelo.
 
-📊 `reports/figuras/fig05-correlacao.png`
+Figura: `reports/figuras/fig05-correlacao.png`
 
 ---
 
@@ -392,7 +391,7 @@ A fronteira entre elas — o público em que uma componente passa a dominar a ou
 > que ele produz não é evidência de nada: cortar na mediana devolve 50/50 em *qualquer*
 > distribuição — inclusive numa em que 1% dos filmes leva 36,2% do público, como é o caso.
 
-📊 `reports/figuras/fig12-duas-populacoes.png`
+Figura: `reports/figuras/fig12-duas-populacoes.png`
 
 ---
 
@@ -401,7 +400,7 @@ A fronteira entre elas — o público em que uma componente passa a dominar a ou
 | # | problema | evidência | gravidade |
 |---|---|---|---|
 | **P1** | alvo global embute o ano | 85,6% (1990s) × 26,3% (2020s) | **crítica** |
-| **P2** | vazamento por `renda` | ρ = 0,994; AUC vai a 0,994 | **crítica** |
+| **P2** | vazamento por `renda` | ρ = 0,994; AUC vai a 0,993 | **crítica** |
 | **P3** | vazamento provável por `max_salas` | +0,108 de AUC | alta |
 | **P4** | assimetria extrema do público | skew 10,0; máx/mediana 4.342× | alta |
 | P5 | cardinalidade da distribuidora | 467 categorias, 287 com um só filme | média |
@@ -434,7 +433,7 @@ ausência. `populacao_br` exigiria interpolação temporal, não média. E a aus
 `max_salas` **não é aleatória**: os filmes sem o campo têm público mediano muito menor,
 ou seja, a própria ausência informa que a carreira foi mínima.
 
-📊 `reports/figuras/fig07-ausentes.png`
+Figura: `reports/figuras/fig07-ausentes.png`
 
 ### 3.2 Outliers — e por que não vamos removê-los
 
@@ -479,7 +478,7 @@ cinema.
 > resolveria nada: o problema não é falta de exemplos de uma classe, é uma definição de
 > alvo que embute a variável errada.
 
-📊 `reports/figuras/fig08-alvo-por-decada.png`
+Figura: `reports/figuras/fig08-alvo-por-decada.png`
 
 ### 3.4 P14 — um quinto dos rótulos é indeterminado
 
@@ -499,7 +498,7 @@ qualquer acurácia que a Entrega 2 venha a reportar, e precisa ser dito antes do
 depois. Nos anos 1990 a instabilidade é tão grande que o corte daquele ano é praticamente um
 sorteio — o IC95% de 1995 tem largura de 10,5 vezes a própria mediana.
 
-📊 `reports/alvo_estabilidade_mediana.csv`
+Tabela: `reports/alvo_estabilidade_mediana.csv`
 
 ### 3.5 P15 — o alvo anual olha para o futuro
 
@@ -567,8 +566,9 @@ a decisão.
 | redução de dimensionalidade | **não aplicar PCA** | H13 | §3.4 |
 
 **Sobre PCA.** Descartado por três razões, e não por esquecimento. O conjunto honesto
-tem **7 atributos numéricos**, dos quais só um par é de fato redundante — não há
-maldição da dimensionalidade a combater. O crescimento de dimensão desta base vem da
+tem **11 atributos numéricos**, dos quais só três pares são redundantes (`ano` e
+`filmes_no_ano`; e cada indicadora de fomento com a sua contagem) — não há maldição da
+dimensionalidade a combater. O crescimento de dimensão desta base vem da
 **codificação categórica**, não das numéricas, e PCA sobre variáveis *dummy* mistura
 categorias sem sentido interpretável. E o custo é alto no que mais importa aqui: os
 componentes não teriam leitura, e o produto do trabalho é justamente explicar *quais*
@@ -646,8 +646,8 @@ Além de aplicar H1–H12, as melhorias de maior retorno estão detalhadas em
 
 | # | melhoria | impacto | viabilidade |
 |---|---|---|---|
-| **M7** | data de estreia + **salas na 1ª semana** | muito alto | 🟢 destravada |
-| **M1** | fomento público (FSA / leis de incentivo) por CPB | alto | 🟢 destravada |
+| **M7** | data de estreia + **salas na 1ª semana** | muito alto | destravada |
+| **M1** | fomento público (FSA / leis de incentivo) por CPB | alto | destravada |
 | **M8** | **alvo = P75 do ano anterior**, com P50 e P90 como robustez | alto | imediata |
 | **M2** | histórico de **sucesso** anterior, não só contagem de filmes | alto | imediata |
 | M3 | validação temporal com janela deslizante | médio | imediata |
@@ -697,7 +697,7 @@ faz o alvo entrar pela porta dos fundos.
 | Notebook executado, com todas as visualizações | `notebooks/` |
 | Figuras em PNG (12) | `reports/figuras/` |
 | Dicionário de dados | `docs/dicionario-de-dados.csv` |
-| Base analítica (2.626 × 28) | `data/processed/filmes.csv` |
+| Base analítica (2.626 × 35) | `data/processed/filmes.csv` |
 | Registro das fontes, com as descartadas | `src/fontes.py` · `docs/01-fontes-de-dados.md` |
 | Decisões de escopo (D1–D9) | `docs/02-decisoes-e-escopo.md` |
 | Melhorias e trade-offs (S1–S6, M1–M8) | `docs/03-melhorias-e-tradeoffs.md` |
@@ -709,6 +709,7 @@ pip install -r requirements.txt
 python src/ingestao.py
 python src/build_dataset.py
 python src/sensibilidades.py
+python src/auditoria_alvo.py
 jupyter lab notebooks/
 ```
 

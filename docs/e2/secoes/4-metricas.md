@@ -2,8 +2,6 @@
 
 > Dona: Laura · Entra na §4 da Ana Raquel, na montagem.
 
-<!-- Rascunho. Conferir 25,3% e 0,747 com o módulo da base antes de fechar. -->
-
 Consideramos o filme de sucesso como a classe positiva. Reportamos as cinco métricas
 pedidas, que são acurácia, F1, precisão, revocação e AUC, e acrescentamos a precisão média.
 Cada uma aparece como média e desvio-padrão amostral dos 5 folds. A acurácia sozinha

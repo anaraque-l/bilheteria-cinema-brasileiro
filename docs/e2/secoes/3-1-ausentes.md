@@ -53,10 +53,11 @@ anterior registrado:
 As nove exceções são entidades cujos filmes anteriores existem mas não têm público informado.
 A informação de que o filme é de estreante, portanto, já consta de outras colunas:
 `filmes_*_antes = 0`, `experiencia_da_direcao` igual a `estreante` e
-`porte_da_distribuidora` igual a `nova`. A previsão é que as duas imputações empatem, porque
-a indicadora acrescenta três colunas que repetem informação já disponível, e três dimensões
-adicionais diluem as demais no cálculo da distância. Caso o empate se confirme na §5.2, essa
-é a explicação, e não a equivalência entre as técnicas.
+`porte_da_distribuidora` igual a `nova`. A previsão é que as duas imputações empatem. A
+indicadora acrescenta sete colunas, e três delas, as dos históricos, repetem informação já
+disponível. As outras quatro vêm do fomento e marcam os 12 filmes sem CPB, que não puderam
+ser cruzados com os registros. Todas diluem as demais dimensões no cálculo da distância. Caso
+o empate se confirme na §5.2, essa é a explicação, e não a equivalência entre as técnicas.
 
 ## Alternativas consideradas e descartadas
 

@@ -19,10 +19,10 @@ como inteiros crescentes preserva a única informação que elas afirmam. Aplica
 `OneHotEncoder` a elas destruiria essa ordem e gastaria oito dimensões para dizer o que duas
 dizem.
 
-O encoder recebe `handle_unknown="use_encoded_value", unknown_value=-1`. O valor -1 atende a
-um caso concreto: a opção `mediana_indicadora` da etapa anterior cria a categoria `ausente`,
-que não tem lugar na ordem das faixas. Ela recebe um código abaixo de todas elas, que é a
-leitura adequada, já que não ter histórico é menos do que pertencer à menor faixa.
+O encoder recebe `handle_unknown="use_encoded_value", unknown_value=-1`. Nesta base as duas
+ordinais não têm valor ausente, porque nascem de contagens que valem zero quando não há filme
+anterior, e por isso o -1 nunca é usado hoje. Ele fica como rede de segurança: uma faixa fora
+da lista receberia um código abaixo de todas, em vez de interromper a grade.
 
 ## As duas opções
 

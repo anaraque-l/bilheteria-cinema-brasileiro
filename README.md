@@ -1,200 +1,191 @@
 # Prever bilheteria de filme brasileiro antes da estreia
 
-**Entrega 1 — Análise Exploratória de Dados**
-CIN0144 · Aprendizado de Máquina e Ciência de Dados · CIn/UFPE
+CIN0144 · Aprendizado de Máquina e Ciência de Dados · CIn/UFPE · Grupo 11
 
-> **Um filme brasileiro vai alcançar público acima da mediana do seu ano de
-> lançamento — prevendo apenas com atributos conhecidos antes da estreia?**
+Entrega 1: análise exploratória. Entrega 2: pré-processamento e pipelines (última seção).
 
-Classificação binária sobre **2.626 filmes brasileiros** lançados comercialmente entre
-1995 e 2024 — **35 atributos** a partir da listagem oficial da ANCINE, dos registros de
-fomento público, do IPCA e do IBGE.
+> Um filme brasileiro vai alcançar público acima do comum para o seu ano, prevendo apenas
+> com atributos conhecidos antes da estreia?
+
+A base tem 2.626 filmes brasileiros lançados comercialmente entre 1995 e 2024, com 35
+atributos montados a partir da listagem oficial da ANCINE, dos registros de fomento
+público, do IPCA e do IBGE.
 
 ---
 
-## O achado principal
+## O principal resultado da Entrega 1
 
-Este trabalho começou com uma pergunta sobre cinema e terminou com uma lição sobre
-definição de alvo.
+A forma literal de construir o alvo, *sucesso = público acima da mediana da base*, dá
+classes equilibradas (50,0% de positivos), mas a mediana global carrega o ano junto:
 
-A forma literal de construir o alvo — *sucesso = público acima da mediana da base* —
-produz classes perfeitamente equilibradas (50,0% / 49,7%) e parece impecável. Só que a
-mediana global embute o **ano**:
-
-| década | % de "sucesso" com mediana **global** | com mediana **do ano** |
+| década | % de sucesso com a mediana global | com a mediana do ano |
 |---|---|---|
-| 1990 | **85,6%** | 49,0% |
+| 1990 | 85,6% | 49,0% |
 | 2000 | 75,7% | 49,5% |
 | 2010 | 50,2% | 49,8% |
-| 2020 | **26,3%** | 49,7% |
+| 2020 | 26,3% | 49,7% |
 
-O mercado mudou: em 1995 lançaram-se 14 filmes brasileiros; nos anos 2010, mais de 180
-por ano — em larga medida documentários de circuito limitado. O público **mediano** por
-filme caiu mais de uma ordem de grandeza. Um corte pela mediana global classifica quase
-todo filme antigo como sucesso e quase todo filme recente como fracasso.
+Em 1995 foram lançados 14 filmes brasileiros; em 2024, 197, boa parte deles documentários
+de circuito limitado. O público mediano por filme caiu 15 vezes no período. Com a mediana
+global, quase todo filme antigo vira sucesso e quase todo filme recente vira fracasso, e um
+modelo treinado assim aprende o calendário, não o cinema.
 
-**Um modelo treinado assim não aprende sobre cinema: aprende a ler o calendário.**
-
-Somando os três atalhos disponíveis nesta base, a diferença é brutal:
+Medimos o peso dos atalhos que a base oferece:
 
 | versão | AUC |
 |---|---|
-| caminho fácil — alvo global, com `renda` e `max_salas`, *k-fold* aleatório | **0,995** |
-| versão honesta — alvo relativo ao ano, só atributos pré-estreia, partição temporal | **0,725** |
+| alvo global, com `renda` e `max_salas`, *k-fold* aleatório | 0,995 |
+| alvo relativo ao ano, só atributos pré-estreia, partição temporal | 0,725 |
 
-**0,27 de AUC** separa as duas, e nenhuma linha de código as distingue à primeira vista.
+A auditoria do alvo (`docs/04`) foi além: o público se divide em duas populações, filmes de
+circuito limitado e lançamentos comerciais, e a fronteira entre elas fica perto do
+percentil 69. Por isso a Entrega 2 usa o percentil 75 do ano anterior como alvo.
 
 ---
 
-## Como este repositório está organizado
+## Organização
 
 ```
 ├── src/
 │   ├── fontes.py              registro das fontes: URL, licenca, cobertura, data de teste
-│   ├── ingestao.py            baixa o bruto para data/raw/ (com cache)
+│   ├── ingestao.py            baixa o bruto para data/raw/, com cache
 │   ├── build_dataset.py       tipagem, juncoes e definicao dos alvos
-│   └── sensibilidades.py      mede o peso de cada decisao de pre-processamento
-├── notebooks/
-│   └── Entrega_1_...ipynb     ENTREGAVEL PRINCIPAL — executado, com saidas
+│   ├── sensibilidades.py      mede o peso de cada decisao de pre-processamento
+│   ├── auditoria_alvo.py      audita a definicao de sucesso
+│   ├── executar_e2.py         Entrega 2: roda as 144 combinacoes
+│   └── e2/                    Entrega 2: base, folds, combinacoes e etapas
+├── notebooks/                 notebook da Entrega 1, executado
 ├── docs/
 │   ├── 00-guia-do-projeto.md  por onde comecar
-│   ├── 01-fontes-de-dados.md  as tres fontes, e as que foram descartadas
-│   ├── 02-decisoes-e-escopo.md decisoes D1..D9, com justificativa
-│   ├── 03-melhorias-e-tradeoffs.md  melhorias, impacto medido, viabilidade
-│   ├── dicionario-de-dados.csv gerado pelo notebook
-│   └── relatorio-entrega1.md  DOCUMENTO DE ENTREGA
+│   ├── 01-fontes-de-dados.md  fontes usadas e descartadas
+│   ├── 02-decisoes-e-escopo.md decisoes D1 a D9
+│   ├── 03-melhorias-e-tradeoffs.md  sensibilidades S1 a S6 e melhorias M1 a M9
+│   ├── 04-auditoria-do-alvo.md  o que conta como sucesso de bilheteria
+│   ├── relatorio-entrega1.md  relatorio da Entrega 1, versao tecnica
+│   ├── roteiro-apresentacao.md roteiro da apresentacao da Entrega 1
+│   └── e2/secoes/             secoes do relatorio da Entrega 2
 ├── data/
 │   ├── raw/                   bruto, versionado de proposito
-│   └── processed/filmes.csv   base analitica (2.626 x 28)
-└── reports/figuras/           as 12 figuras do relatorio, em PNG
+│   └── processed/filmes.csv   base analitica, 2.626 x 35
+├── reports/                   tabelas e figuras geradas pelos scripts
+└── tests/                     testes rapidos
 ```
 
-## Rodando
+## Como rodar
 
-Python 3.12. Nenhuma fonte exige cadastro, chave de API ou aceite de termos.
+Python 3.12 ou superior. Nenhuma fonte exige cadastro, chave de API ou aceite de termos.
 
 ```bash
 pip install -r requirements.txt
-python src/ingestao.py        # baixa o bruto (cache: repetir nao vai a rede)
+python src/ingestao.py        # baixa o bruto; com cache, repetir nao vai a rede
 python src/build_dataset.py   # monta data/processed/filmes.csv
-python src/sensibilidades.py  # roda as seis analises de sensibilidade
+python src/sensibilidades.py  # as seis analises de sensibilidade
+python src/auditoria_alvo.py  # tabelas reports/alvo_*.csv e a figura 12
+python -m unittest discover -s tests
 jupyter lab notebooks/
 ```
 
+Se o certificado de algum servidor do gov.br falhar na ingestão, rode
+`python src/ingestao.py --sem-verificar-ssl`. O padrão é verificar.
+
 ---
 
-## As fontes
+## Fontes
 
 | fonte | órgão | uso | licença |
 |---|---|---|---|
-| Listagem dos Filmes Brasileiros Lançados 1995–2024 | ANCINE / OCA | base primária — 2.626 filmes, 13 campos | dado aberto federal |
-| Obras com Investimento do FSA | ANCINE | fomento direto, junção por CPB | **CC-BY** |
-| Obras com Fomento Indireto Aprovado | ANCINE | leis de incentivo, junção por CPB | **CC-BY** |
+| Listagem dos Filmes Brasileiros Lançados 1995–2024 | ANCINE / OCA | base primária, 2.626 filmes | dado aberto federal |
+| Obras com Investimento do FSA | ANCINE | fomento direto, junção por CPB | CC-BY |
+| Obras com Fomento Indireto Aprovado | ANCINE | leis de incentivo, junção por CPB | CC-BY |
 | IPCA, série 433 do SGS | Banco Central | deflacionar a renda para reais de 2024 | dado aberto federal |
-| População residente estimada (agregado 6579) | IBGE | contexto de mercado | dado aberto federal |
+| População residente estimada, agregado 6579 | IBGE | contexto de mercado | dado aberto federal |
 
-Todas regidas pela Lei 12.527/2011 (LAI) e pelo Decreto 8.777/2016: uso livre, com
-citação da fonte, sem restrição a uso acadêmico.
+Os dados abertos federais seguem a Lei 12.527/2011 e o Decreto 8.777/2016: uso livre, com
+citação da fonte. A listagem 1995–2025, citada em algumas referências, não estava publicada
+em 10/09/2026; as URLs de 2025 devolvem 404, e trabalhamos com 1995–2024.
 
-**Ressalva.** A listagem *1995–2025* mencionada em várias referências **não existe**.
-Em 10/09/2026, a edição publicada mais recente é a `1995 a 2024r`; as URLs de 2025
-devolvem HTTP 404. Trabalhamos com 1995–2024.
-
-Fontes testadas e descartadas — e o motivo de cada uma — estão em `fontes.DESCARTADAS`.
-Entre elas, o Wikidata, que traria a **duração** dos filmes (atributo que a ANCINE não
-publica) mas cujo endpoint não é alcançável neste ambiente.
+As fontes testadas e descartadas, com o motivo, estão em `fontes.DESCARTADAS`. Entre elas
+está o Wikidata, que traria a duração dos filmes, mas cujo endereço não respondeu na rede
+em que trabalhamos.
 
 ---
 
-## O que a análise encontrou
+## O que a Entrega 1 encontrou
 
-**A bilheteria brasileira é uma distribuição de lei de potência.** Público mediano de
-**2.806 espectadores** contra média de 148.399 — 53 vezes maior. Assimetria 10,0,
-curtose 135,3, máximo 4.342 vezes a mediana. **1% dos filmes concentra 36% do público;
-10% concentram 91%; a metade inferior responde por 0,28%.**
+O público tem cauda muito longa: mediana de 2.806 espectadores e média de 148.399,
+assimetria 10,0 e curtose 135,2. O 1% de filmes de maior público concentra 36% do total; a
+metade de menor público fica com 0,28%.
 
-**Treze problemas diagnosticados**, dos quais quatro são estruturais: alvo que embute o
-ano, vazamento por `renda`, vazamento provável por `max_salas`, e assimetria extrema.
-Os demais vão de cardinalidade (467 distribuidoras, muitas com um único filme) a
-ausência MNAR e a um campo de UF malformado (87 valores distintos para 27 UFs
-possíveis).
+O relatório lista quinze problemas. Quatro são estruturais: o alvo global que carrega o
+ano, o vazamento por `renda`, o vazamento provável por `max_salas` e a assimetria. Os
+outros vão da cardinalidade, com 467 distribuidoras, à ausência não aleatória de
+`max_salas` e ao campo de UF malformado. A auditoria do alvo acrescentou dois: um quinto
+dos rótulos cai dentro do intervalo de confiança da mediana do ano, e essa mediana só é
+conhecida em dezembro, depois da estreia.
 
-**Duas hipóteses são de *não fazer*.** Não aplicar balanceamento, porque as classes já
-estão em 50/50 por construção — SMOTE aqui seria cumprir tabela. E não remover a cauda
-como *outlier*, porque num regime de lei de potência a cauda não é anomalia, é o
-fenômeno.
+Três hipóteses são de não fazer: não balancear, porque o alvo na mediana é 50/50 por
+construção; não remover a cauda como *outlier*, porque ela é o próprio fenômeno; e não
+aplicar PCA, porque o excesso de dimensão vem das categóricas. A Entrega 2 revê a
+primeira e a última.
 
----
-
-## O que mede o quê
-
-Cada hipótese de pré-processamento foi transformada em número por
-[`src/sensibilidades.py`](src/sensibilidades.py). Protocolo fixo: floresta aleatória,
-5-fold estratificado, todo o pré-processamento dentro dos folds.
+Cada hipótese foi medida por `src/sensibilidades.py`, com floresta aleatória, 5-fold
+estratificado e todo o pré-processamento dentro dos folds. O modelo serve só para comparar
+duas versões da base; nenhum destes números é o desempenho do trabalho.
 
 | # | pergunta | resposta |
 |---|---|---|
 | S1 | quanto vale cada atributo posterior ao lançamento? | `max_salas` +0,108 · `renda` +0,161 |
-| S2 | mediana global ou mediana do ano? | o alvo relativo custa −0,062 e elimina o atalho |
-| S3 | partição aleatória ou temporal? | a aleatória é +0,087 otimista |
-| S4 | como tratar 467 distribuidoras? | `min_frequency` 5–15: −0,009 de AUC, −380 colunas |
-| S5 | `log1p` ajuda? | +0,024 na regressão logística, **0,000** na floresta |
-| S6 | remover `n_ufs` (moda em 97,1%)? | 0,000 — indistinguível de zero |
+| S2 | mediana global ou mediana do ano? | o alvo relativo custa 0,062 e elimina o atalho |
+| S3 | partição aleatória ou temporal? | a aleatória é 0,087 otimista |
+| S4 | como tratar 467 distribuidoras? | `min_frequency` 5 a 15: −0,009 de AUC e −380 colunas |
+| S5 | `log1p` ajuda? | +0,024 na regressão logística, 0,000 na floresta |
+| S6 | remover `n_ufs`, com moda em 97,1%? | 0,000 |
 
-> O modelo aqui é **instrumento de medida**, como um termômetro. Nenhum destes números
-> é "o desempenho do nosso modelo": a modelagem é a Entrega 2. A base entregue
-> permanece sem imputação, sem remoção de *outlier* e sem codificação, como o enunciado
-> exige de uma entrega exploratória.
-
----
-
-## Entregáveis
-
-| item | onde |
-|---|---|
-| Notebook executado, com as visualizações | [`notebooks/`](notebooks/) |
-| Relatório | [`docs/relatorio-entrega1.md`](docs/relatorio-entrega1.md) |
-| Figuras em PNG | [`reports/figuras/`](reports/figuras/) |
+Entregáveis da Entrega 1: o notebook em `notebooks/`, o relatório em `docs/` (versão
+técnica em Markdown e versão de entrega em `.docx`) e as figuras em `reports/figuras/`.
 
 ---
 
 ## Entrega 2: pré-processamento e pipelines
 
-Mesma base, outra pergunta: quanto cada etapa de preparação dos dados muda o desempenho
-de um kNN com k = 7 fixo. São 144 combinações de pré-processamento, avaliadas com o mesmo
-5-fold estratificado.
+A pergunta passa a ser quanto cada etapa de preparação dos dados muda o desempenho de um
+kNN com k = 7 fixo. São 144 combinações, todas avaliadas nos mesmos cinco folds.
 
-O alvo mudou, seguindo a recomendação da Entrega 1: sucesso passa a ser público acima do
-percentil 75 dos filmes brasileiros do ano anterior, um limiar conhecido antes da estreia
-e próximo da fronteira entre as duas populações de público. São 2.590 filmes, 25,3% deles
-sucesso. Entram também três atributos de histórico de sucesso da direção, da distribuidora
-e da produtora, calculados só com anos anteriores.
+O alvo segue a recomendação da Entrega 1: sucesso é público acima do percentil 75 dos
+filmes brasileiros do ano anterior, um limiar que já existe antes da estreia. Ficam 2.590
+filmes, 25,3% deles sucesso. Entram três atributos de histórico de sucesso, da direção, da
+distribuidora e da produtora, calculados só com anos anteriores.
+
+Com esse alvo a classe de sucesso é 1 para 3, e o balanceamento passa a fazer sentido. E o
+kNN, ao contrário da floresta usada na Entrega 1, é sensível a escala e a dimensão, então a
+redução de dimensionalidade volta à grade. Cada etapa mantém a opção "sem", para que as
+duas decisões da Entrega 1 sejam testadas.
 
 | etapa | opções |
 |---|---|
 | valores ausentes | mediana e moda · mediana com indicadora de ausência |
 | encoding | one-hot com agrupamento de raras · encoding pelo alvo |
 | normalização | sem · z-score · min-max · robusta |
-| redução | sem · PCA · seleção das 10 melhores por informação mútua |
+| redução | sem · PCA · seleção de atributos |
 | balanceamento | sem · subamostragem · SMOTE |
 
-A ordem dentro de cada fold é `ausentes → encoding → normalização → redução →
-balanceamento → kNN`, e o motivo de cada posição está em
-[`src/e2/espaco.py`](src/e2/espaco.py).
+Dentro de cada fold a ordem é `ausentes → encoding → normalização → redução →
+balanceamento → kNN`; o motivo de cada posição está em `src/e2/espaco.py`.
 
 ```bash
 python src/e2/base.py         # resumo da base e teste de que o historico nao vaza
 python src/executar_e2.py     # roda as 144; retoma de onde parou
 ```
 
-Resultados em `reports/e2/`: uma linha por combinação em `resultados.csv`, uma por
-combinação e fold em `resultados_por_fold.csv`, os folds em `folds.csv` e as versões
-das bibliotecas em `ambiente.json`.
+O motor precisa das cinco etapas em `src/e2/etapas/` e das métricas em `src/e2/`. Os
+resultados vão para `reports/e2/`: `resultados.csv` com uma linha por combinação,
+`resultados_por_fold.csv` com uma por combinação e fold, `folds.csv` e `ambiente.json`
+com as versões das bibliotecas.
 
 ---
 
 ## Licença
 
-Código sob [licença MIT](LICENSE). Os dados são públicos e pertencem aos órgãos que os
-publicam (ANCINE, IBGE, Banco Central), redistribuídos aqui sob as condições de dado
-aberto federal, com citação da fonte — ver [`NOTICE-DADOS.md`](NOTICE-DADOS.md).
+Código sob [licença MIT](LICENSE). Os dados pertencem aos órgãos que os publicam e são
+redistribuídos aqui como dado aberto, com citação da fonte; ver
+[`NOTICE-DADOS.md`](NOTICE-DADOS.md).
