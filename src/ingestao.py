@@ -2,6 +2,7 @@
 """Baixa as fontes brutas para data/raw/, com cache.
 
 Executar: python src/ingestao.py [chave ...]   (sem argumento roda tudo)
+          python src/ingestao.py --sem-verificar-ssl   (so se o certificado falhar)
 
 Principios:
   - so biblioteca padrao (urllib), para nao exigir instalacao alem do
@@ -27,18 +28,22 @@ BRUTO = RAIZ / "data" / "raw"
 CABECALHO = {"User-Agent": "CIn-UFPE-CIN0144-projeto-academico/1.0"}
 TEMPO_LIMITE = 90
 
+# O certificado e verificado, a menos que a pessoa peca o contrario na linha de comando.
+VERIFICAR_SSL = True
+
 
 def _contexto_ssl():
-    """Contexto permissivo.
+    """Contexto HTTPS, com verificacao de certificado por padrao.
 
-    Alguns servidores do gov.br apresentam cadeia incompleta dependendo do
-    ponto de saida da rede. Como so LEMOS dado publico e nao enviamos nada
-    sensivel, afrouxar a verificacao aqui e aceitavel e evita que a ingestao
-    falhe em maquina de integrante do grupo.
+    Alguns servidores do gov.br entregam a cadeia incompleta, dependendo da rede.
+    Quando isso acontece, --sem-verificar-ssl afrouxa a verificacao so naquela
+    execucao. So lemos dado publico, entao o risco e baixo, mas a protecao nao
+    pode ficar desligada para quem nao tem o problema.
     """
     ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
+    if not VERIFICAR_SSL:
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
     return ctx
 
 
@@ -152,7 +157,11 @@ ETAPAS = {
 
 
 def main(argv):
+    global VERIFICAR_SSL
     forcar = "--forcar" in argv
+    if "--sem-verificar-ssl" in argv:
+        VERIFICAR_SSL = False
+        print("ATENCAO: verificacao de certificado desligada nesta execucao.")
     pedidas = [a for a in argv if not a.startswith("--")] or list(ETAPAS)
     desconhecidas = [p for p in pedidas if p not in ETAPAS]
     if desconhecidas:
