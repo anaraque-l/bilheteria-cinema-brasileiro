@@ -72,7 +72,8 @@ def limiar_do_ano_anterior(d, quantil):
     """Quantil do publico do ano anterior, mapeado para cada filme."""
     por_ano = d.groupby("ano")["publico"].quantile(quantil)
     # o deslocamento abaixo so significa ano anterior se nao faltar ano na serie
-    assert (np.diff(por_ano.index) == 1).all(), "serie de anos com buraco"
+    if not (np.diff(por_ano.index) == 1).all():
+        raise ValueError("serie de anos com buraco")
     return d["ano"].map(por_ano.shift(1))
 
 
@@ -101,7 +102,8 @@ def carregar_xy(quantil=0.75):
     O quantil 0.75 e o alvo principal; 0.50 e 0.90 servem a robustez.
     """
     proibidas = set(bd.COLUNAS_PROIBIDAS) & set(ATRIBUTOS)
-    assert not proibidas, "coluna proibida entre os atributos: %s" % proibidas
+    if proibidas:
+        raise ValueError("coluna proibida entre os atributos: %s" % proibidas)
     d = montar(quantil)
     return d[ATRIBUTOS].copy(), d["sucesso"].astype(int), d["ano"].copy()
 
@@ -143,8 +145,10 @@ def checar_nao_vazamento(anos=(2005, 2012, 2019)):
         for coluna, entidade in HISTORICOS.items():
             depois_da_mudanca = historico_de_sucesso(mexida, entidade)
             igual = np.isclose(antes[coluna], depois_da_mudanca, equal_nan=True)
-            assert igual[ate_t].all(), "%s vaza no ano %d" % (coluna, t)
-            assert not igual[depois].all(), "%s nao reage ao ano %d" % (coluna, t)
+            if not igual[ate_t].all():
+                raise ValueError("%s vaza no ano %d" % (coluna, t))
+            if igual[depois].all():
+                raise ValueError("%s nao reage ao ano %d" % (coluna, t))
     return True
 
 

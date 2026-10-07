@@ -18,8 +18,9 @@ MIN_FREQUENCIA = 10
 
 
 def _ordinais():
-    # a categoria ausente so aparece com a imputacao por indicadora, e nao
-    # tem lugar na ordem; vira um codigo abaixo de todas as faixas
+    # as ordinais nao tem ausente nesta base, entao o -1 nunca e usado hoje; fica como
+    # rede de seguranca, e uma faixa fora da lista ganha um codigo abaixo de todas
+    # em vez de interromper a grade
     return OrdinalEncoder(
         categories=[bd.ORDEM_ORDINAIS[c] for c in ORDINAIS],
         handle_unknown="use_encoded_value", unknown_value=-1,
