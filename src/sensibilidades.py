@@ -32,7 +32,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, StandardScaler
 
 warnings.filterwarnings("ignore")
 
@@ -41,6 +41,11 @@ SEMENTE = 42
 
 # O conjunto "honesto": tudo que um produtor sabe ANTES de estrear o filme.
 # Nao ha publico, nao ha renda, nao ha numero de salas.
+#
+# Excecao conhecida: a contagem de filmes do ano esta aqui, mas a auditoria do alvo
+# mostrou que ela so fecha em 31 de dezembro, e a lista de colunas proibidas do modulo
+# da base a proibe. Ela ficou para que S1 a S6 continuem reproduzindo os numeros
+# entregues. Quem montar um X novo nao deve copiar esta lista.
 NUM_HONESTAS = ["ano", "filmes_diretor_antes", "filmes_distribuidora_antes",
                 "filmes_produtora_antes", "filmes_no_ano", "coproducao", "n_ufs",
                 # Fomento e APROVADO antes de a obra existir: anterior a estreia.
@@ -67,7 +72,7 @@ def _pipeline(num, cat, modelo, log_num=False, max_cat=30):
     """
     passos_num = [("imp", SimpleImputer(strategy="median"))]
     if log_num:
-        passos_num.append(("log", _Log1p()))
+        passos_num.append(("log", FunctionTransformer(_log1p_nao_negativo)))
     passos_num.append(("esc", StandardScaler()))
 
     prep = ColumnTransformer([
@@ -84,21 +89,9 @@ def _pipeline(num, cat, modelo, log_num=False, max_cat=30):
     return Pipeline([("prep", prep), ("modelo", modelo)])
 
 
-class _Log1p:
-    """log1p em matriz densa. Sklearn tem FunctionTransformer, mas uma classe
-    nomeada aparece melhor no repr do pipeline e no relatorio."""
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        return np.log1p(np.clip(np.asarray(X, dtype=float), 0, None))
-
-    def get_params(self, deep=True):
-        return {}
-
-    def set_params(self, **kw):
-        return self
+def _log1p_nao_negativo(X):
+    """log1p com os valores negativos levados a zero antes, para o log nunca falhar."""
+    return np.log1p(np.clip(np.asarray(X, dtype=float), 0, None))
 
 
 def _auc(d, num, cat, alvo, modelo, log_num=False):

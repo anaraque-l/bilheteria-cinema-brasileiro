@@ -17,8 +17,8 @@ O QUE ESTE MODULO NAO FAZ - e nao deve fazer na Entrega 1
   Nao balanceia. Nao seleciona atributo. O enunciado e explicito: esta entrega
   descreve e diagnostica; a correcao e a Entrega 2. As hipoteses de
   pre-processamento sao ESCRITAS em docs/03-melhorias-e-tradeoffs.md, e la sao
-  MEDIDAS por analise de
-  sensibilidade - medir o impacto de uma decisao nao e o mesmo que aplica-la.
+  MEDIDAS por analise de sensibilidade - medir o impacto de uma decisao nao e o
+  mesmo que aplica-la.
 """
 
 import json
@@ -42,6 +42,15 @@ COLUNAS = [
     "produtora_min", "uf2_bruto", "distribuidora", "max_salas", "publico",
     "renda_corrente", "_vazia",
 ]
+
+# Ordem das categoricas ORDINAIS. Precisa viver aqui porque o CSV nao guarda
+# tipo: sem restaurar isso na leitura, um groupby ordena alfabeticamente e
+# "estabelecida" vem antes de "estreante" - o que destroi justamente a ordem
+# que torna o atributo ordinal.
+ORDEM_ORDINAIS = {
+    "experiencia_da_direcao": ["estreante", "iniciante", "estabelecida", "veterana"],
+    "porte_da_distribuidora": ["nova", "pequena", "media", "grande"],
+}
 
 
 # ---------------------------------------------------------------------------
@@ -210,6 +219,7 @@ def _populacao():
 # ---------------------------------------------------------------------------
 
 def montar(verboso=True):
+    """Monta a base analitica, grava em data/processed/ e devolve o DataFrame."""
     filmes, notas = _ler_ancine()
     f = filmes.reset_index(drop=True)
     d = pd.DataFrame(index=range(len(f)))
@@ -335,17 +345,8 @@ def atributos_legitimos(d):
     return [c for c in d.columns if c not in fora]
 
 
-# Ordem das categoricas ORDINAIS. Precisa viver aqui porque o CSV nao guarda
-# tipo: sem restaurar isso na leitura, um groupby ordena alfabeticamente e
-# "estabelecida" vem antes de "estreante" - o que destroi justamente a ordem
-# que torna o atributo ordinal.
-ORDEM_ORDINAIS = {
-    "experiencia_da_direcao": ["estreante", "iniciante", "estabelecida", "veterana"],
-    "porte_da_distribuidora": ["nova", "pequena", "media", "grande"],
-}
-
-
 def _restaurar_ordinais(d):
+    """O CSV nao guarda tipo: devolve as ordinais como categoricas ordenadas."""
     for col, ordem in ORDEM_ORDINAIS.items():
         if col in d.columns:
             d[col] = d[col].astype(pd.CategoricalDtype(categories=ordem, ordered=True))
