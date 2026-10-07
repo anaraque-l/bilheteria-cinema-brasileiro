@@ -14,3 +14,6 @@ Thumbs.db
 
 # clone que o notebook faz quando roda fora do Colab
 notebooks/bilheteria-cinema-brasileiro/
+
+# rodada de teste da Entrega 2, nao e resultado
+reports/e2/rapido/
