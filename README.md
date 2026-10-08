@@ -204,6 +204,56 @@ com as versões das bibliotecas.
 
 ---
 
+## Entrega 2: resultados e conclusões
+
+As **144 combinações de pré-processamento** foram executadas sem erros, com kNN de 7 vizinhos e validação cruzada em cinco folds. A AUC variou de **0,731 a 0,853**, mostrando o impacto das escolhas de preparação dos dados.
+
+### Comparação dos pipelines
+
+| Configuração | AUC |
+|---|---|
+| Melhor: encoding pelo alvo, padronização, PCA e subamostragem | **0,853 ± 0,016** |
+| Baseline: sem transformações opcionais | **0,827 ± 0,014** |
+| Pior: indicadora, one-hot, PCA sem normalização e subamostragem | **0,731 ± 0,015** |
+
+Apesar das diferenças, **104 das outras 143 combinações empataram com o baseline**, considerando a variabilidade entre folds.
+
+![Ranking das combinações](reports/figuras/e2/fig-al-ranking.png)
+
+### Efeito das técnicas
+
+A **normalização** foi a etapa mais importante, com 68 vitórias, 40 empates e nenhuma derrota em 108 comparações. As três escalas tiveram desempenho semelhante.
+
+O encoding pelo alvo apresentou uma pequena vantagem sobre o one-hot. Já a redução de dimensionalidade não melhorou a AUC, embora a seleção de atributos tenha empatado com a ausência de redução em **43 dos 48 contextos**.
+
+![Efeito das etapas](reports/figuras/e2/fig-al-efeitos.png)
+
+### Interações entre etapas
+
+O efeito de uma técnica também depende das anteriores. O **PCA sem normalização** reduziu os dados a apenas dois componentes e causou uma perda média de **0,065 de AUC**. Com normalização, esse prejuízo praticamente desapareceu.
+
+A normalização também apresentou ganhos maiores quando combinada ao encoding pelo alvo.
+
+![Interações entre etapas](reports/figuras/e2/fig-al-interacoes.png)
+
+### Balanceamento e custo
+
+A subamostragem aumentou a revocação de **0,547 para 0,741**, mas reduziu a precisão de **0,692 para 0,543**. Assim, o modelo encontrou mais sucessos, porém com mais falsos positivos.
+
+A grade completa levou **3,9 minutos**. A seleção por informação mútua e o one-hot foram as opções mais caras, enquanto a normalização teve custo adicional praticamente desprezível.
+
+### Robustez e limitações
+
+Na validação temporal, com treino até 2017 e teste a partir de 2018, o baseline caiu de **0,827 para 0,588 de AUC**, enquanto a melhor combinação passou de **0,853 para 0,793**.
+
+![Comparação entre validação cruzada e temporal](reports/figuras/e2/fig-lf-auc-5fold-temporal.png)
+
+A maior limitação apareceu nos documentários: a revocação da melhor combinação foi de apenas **0,118**, contra **0,826 em filmes de ficção**.
+
+**Conclusão:** a normalização foi a decisão mais importante, mas a ordem das etapas e a validação temporal também se mostraram fundamentais. O pré-processamento não apenas melhora métricas: ele muda o que o modelo aprende.
+
+---
+
 ## Licença
 
 Código sob [licença MIT](LICENSE). Os dados pertencem aos órgãos que os publicam e são
