@@ -24,9 +24,8 @@ from sklearn.base import clone
 from sklearn.metrics import get_scorer
 from sklearn.model_selection import cross_val_predict
 
+from e2.espaco import ETAPAS
 from e2.metricas import PRINCIPAL, SCORING
-
-ETAPAS = ["ausentes", "encoding", "normalizacao", "reducao", "balanceamento"]
 
 # Mesmo corte da Entrega 1. Os anos de pandemia ficam todos no teste,
 # que e o futuro que o modelo nao viu.

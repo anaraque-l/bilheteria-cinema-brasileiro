@@ -53,8 +53,11 @@ percentil 69. Por isso a Entrega 2 usa o percentil 75 do ano anterior como alvo.
 │   ├── sensibilidades.py      mede o peso de cada decisao de pre-processamento
 │   ├── auditoria_alvo.py      audita a definicao de sucesso
 │   ├── executar_e2.py         Entrega 2: roda as 144 combinacoes
+│   ├── analisar_e2.py         Entrega 2: tabelas e figuras da analise
+│   ├── robustez_e2.py         Entrega 2: as tres checagens de robustez
+│   ├── montar_relatorio_e2.py Entrega 2: junta as secoes no relatorio .md e .docx
 │   └── e2/                    Entrega 2: base, folds, combinacoes e etapas
-├── notebooks/                 notebook da Entrega 1, executado
+├── notebooks/                 notebooks das Entregas 1 e 2, executados
 ├── docs/
 │   ├── 00-guia-do-projeto.md  por onde comecar
 │   ├── 01-fontes-de-dados.md  fontes usadas e descartadas
@@ -63,7 +66,12 @@ percentil 69. Por isso a Entrega 2 usa o percentil 75 do ano anterior como alvo.
 │   ├── 04-auditoria-do-alvo.md  o que conta como sucesso de bilheteria
 │   ├── relatorio-entrega1.md  relatorio da Entrega 1, versao tecnica
 │   ├── roteiro-apresentacao.md roteiro da apresentacao da Entrega 1
-│   └── e2/secoes/             secoes do relatorio da Entrega 2
+│   └── e2/
+│       ├── relatorio-entrega2.md  relatorio da Entrega 2, montado a partir das secoes
+│       ├── Relatorio_Entrega_2_Grupo_11.docx  o mesmo relatorio, versao de entrega
+│       ├── estilo-relatorio.docx  modelo de estilos do .docx
+│       ├── hipoteses-balanceamento.md  o que esperavamos antes da grade e o veredito
+│       └── secoes/            uma secao por arquivo, com a dona de cada uma
 ├── data/
 │   ├── raw/                   bruto, versionado de proposito
 │   └── processed/filmes.csv   base analitica, 2.626 x 35
@@ -174,17 +182,21 @@ balanceamento → kNN`; o motivo de cada posição está em `src/e2/espaco.py`.
 
 ```bash
 python src/e2/base.py         # resumo da base e teste de que o historico nao vaza
-python src/executar_e2.py     # roda as 144; retoma de onde parou
+python src/executar_e2.py     # roda as 144, cerca de 4 minutos; retoma de onde parou
+python src/analisar_e2.py     # empate, ranking, efeitos, interacoes, custo e figuras
+python src/robustez_e2.py     # particao temporal, cortes P50 e P90, e por genero
+python src/e2/anexo.py        # tabela das 144 para o anexo
+python src/montar_relatorio_e2.py --docx  # junta as secoes no relatorio; o .docx pede pandoc
 ```
 
-Estado atual: base, alvo, folds, as etapas de ausentes, encoding e balanceamento, as
-métricas, o motor, a robustez e o anexo estão prontos e testados. Faltam as etapas de
-normalização e redução e a análise dos resultados; até lá a grade não roda, e
-`src/robustez_e2.py` usa substitutos provisórios de `src/e2/_provisorio.py` e avisa que os
-números não valem.
+A grade rodou sem nenhuma combinação com erro, e rodá-la duas vezes dá as mesmas métricas.
 
-O motor precisa das cinco etapas em `src/e2/etapas/` e das métricas em `src/e2/`. Os
-resultados vão para `reports/e2/`: `resultados.csv` com uma linha por combinação,
+Entregáveis da Entrega 2: o notebook em `notebooks/`, que refaz a grade e confere que ela
+bate com `reports/e2/resultados.csv`, o relatório em `docs/e2/` (versão em Markdown e
+versão de entrega em `.docx`, com o corpo em menos de dez páginas) e as figuras em
+`reports/figuras/e2/`.
+
+Os resultados vão para `reports/e2/`: `resultados.csv` com uma linha por combinação,
 `resultados_por_fold.csv` com uma por combinação e fold, `folds.csv` e `ambiente.json`
 com as versões das bibliotecas.
 

@@ -1,0 +1,15 @@
+etapa,opcao,tempo_medio_s
+ausentes,mediana_indicadora,1.689467652430592
+ausentes,mediana_moda,1.5428189740694147
+encoding,alvo,1.0218241754444237
+encoding,onehot,2.210462451055583
+normalizacao,minmax,1.6756636625833734
+normalizacao,padrao,1.7431623523611455
+normalizacao,robusto,1.7198021266111079
+normalizacao,sem,1.3259451114443865
+reducao,kbest,2.5953970034374785
+reducao,pca,1.4894281036250543
+reducao,sem,0.7636048326874771
+balanceamento,sem,1.5988608966457842
+balanceamento,smote,1.6903887368125556
+balanceamento,subamostragem,1.55918030629167
