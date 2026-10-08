@@ -14,11 +14,11 @@ from pathlib import Path
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from e2.espaco import ETAPAS
 from e2.metricas import SCORING
 
 RAIZ = Path(__file__).resolve().parents[2]
 SAIDA = RAIZ / "reports" / "e2"
-ETAPAS = ["ausentes", "encoding", "normalizacao", "reducao", "balanceamento"]
 ROTULO = {"accuracy": "acurácia", "f1": "F1", "precision": "precisão",
           "recall": "revocação", "roc_auc": "AUC", "average_precision": "AP"}
 
