@@ -67,8 +67,9 @@ percentil 69. Por isso a Entrega 2 usa o percentil 75 do ano anterior como alvo.
 │   ├── relatorio-entrega1.md  relatorio da Entrega 1, versao tecnica
 │   ├── roteiro-apresentacao.md roteiro da apresentacao da Entrega 1
 │   └── e2/
-│       ├── relatorio-entrega2.md  relatorio da Entrega 2, montado a partir das secoes
-│       ├── Relatorio_Entrega_2_Grupo_11.docx  o mesmo relatorio, versao de entrega
+│       ├── Relatorio_Entrega_2_Grupo_11.pdf  relatorio da Entrega 2, versao entregue
+│       ├── relatorio-entrega2.md  rascunho de trabalho, montado a partir das secoes
+│       ├── Relatorio_Entrega_2_Grupo_11.docx  o rascunho em .docx, gerado pelo script
 │       ├── estilo-relatorio.docx  modelo de estilos do .docx
 │       ├── hipoteses-balanceamento.md  o que esperavamos antes da grade e o veredito
 │       └── secoes/            uma secao por arquivo, com a dona de cada uma
@@ -192,9 +193,10 @@ python src/montar_relatorio_e2.py --docx  # junta as secoes no relatorio; o .doc
 A grade rodou sem nenhuma combinação com erro, e rodá-la duas vezes dá as mesmas métricas.
 
 Entregáveis da Entrega 2: o notebook em `notebooks/`, que refaz a grade e confere que ela
-bate com `reports/e2/resultados.csv`, o relatório em `docs/e2/` (versão em Markdown e
-versão de entrega em `.docx`, com o corpo em menos de dez páginas) e as figuras em
-`reports/figuras/e2/`.
+bate com `reports/e2/resultados.csv`, o relatório entregue em
+`docs/e2/Relatorio_Entrega_2_Grupo_11.pdf`, com o corpo em menos de dez páginas, e as
+figuras em `reports/figuras/e2/`. As seções em `docs/e2/secoes/` e o
+`relatorio-entrega2.md` são o rascunho de onde o texto final saiu.
 
 Os resultados vão para `reports/e2/`: `resultados.csv` com uma linha por combinação,
 `resultados_por_fold.csv` com uma por combinação e fold, `folds.csv` e `ambiente.json`
