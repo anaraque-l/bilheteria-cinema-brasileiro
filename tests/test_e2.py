@@ -158,6 +158,37 @@ class TestRobustezEAnexo(unittest.TestCase):
         self.assertEqual(tabela["AUC"].iloc[-1], "—")
 
 
+class TestMontagemDoRelatorio(unittest.TestCase):
+    """A montagem encaixa a secao das metricas dentro da §4 por indice.
+
+    Se alguem puser 4-metricas na ORDEM, o paragrafo sai duas vezes e ninguem
+    percebe lendo o .md de ponta a ponta. Foi o que chegou ao documento final.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import montar_relatorio_e2 as montagem
+        cls.texto = montagem.montar()
+
+    def paragrafos(self):
+        # so os de texto corrido; tabela e figura repetem celula por natureza
+        return [p.strip() for p in self.texto.split("\n\n")
+                if len(p.split()) > 25 and not p.lstrip().startswith(("|", "!", ">"))]
+
+    def test_nenhum_paragrafo_aparece_duas_vezes(self):
+        vistos = set()
+        for p in self.paragrafos():
+            self.assertNotIn(p[:120], vistos, "paragrafo repetido na montagem")
+            vistos.add(p[:120])
+
+    def test_o_paragrafo_das_metricas_entra_uma_vez(self):
+        self.assertEqual(self.texto.count("O filme de sucesso é a classe positiva"), 1)
+
+    def test_a_marca_da_tabela_do_anexo_foi_substituida(self):
+        import montar_relatorio_e2 as montagem
+        self.assertNotIn(montagem.MARCA_TABELA, self.texto)
+
+
 class TestGradeCompleta(unittest.TestCase):
     def test_sao_144_combinacoes_com_um_unico_baseline(self):
         todas = espaco.combinacoes()

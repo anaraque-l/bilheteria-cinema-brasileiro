@@ -6,10 +6,9 @@ Como executar: python src/robustez_e2.py
 O que sai em reports/e2: uma tabela para cada checagem e uma com a
 correlacao entre os rankings. Em reports/figuras/e2 saem dois graficos.
 
-A base e os folds ja sao os de verdade. Enquanto alguma etapa da grade ou o
-arquivo de resultados ainda nao existe, o script usa versoes simplificadas
-deles e avisa no final. Os numeros dessas rodadas servem
-so para testar o codigo e nao entram no relatorio.
+Roda sobre o mesmo pipeline e os mesmos folds da grade. Sem resultados.csv o
+script para: numero de robustez so significa alguma coisa contra as
+combinacoes que o relatorio cita.
 """
 
 import sys
@@ -24,7 +23,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from e2 import robustez as rb  # noqa: E402
 from e2.base import carregar_xy, folds  # noqa: E402
-from e2.espaco import construir_pipeline as _pipeline_da_grade  # noqa: E402
+from e2.espaco import construir_pipeline  # noqa: E402
 from e2.metricas import PRINCIPAL  # noqa: E402
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -32,29 +31,13 @@ SAIDA = RAIZ / "reports" / "e2"
 FIGURAS = RAIZ / "reports" / "figuras" / "e2"
 QUANTIS = [0.50, 0.75, 0.90]
 
-PROVISORIO = False
-
-
-def construir_pipeline(config):
-    """Usa o pipeline da grade e, se faltar alguma etapa, a versao simplificada."""
-    global PROVISORIO
-    try:
-        return _pipeline_da_grade(config)
-    except ModuleNotFoundError:
-        PROVISORIO = True
-        from e2._provisorio import construir_pipeline as simplificado
-        return simplificado(config)
-
-
 def carregar_resultados():
-    """Le os resultados da grade, ou usa numeros de teste se eles ainda nao existem."""
+    """Le os resultados da grade. Sem eles nao ha o que selecionar."""
     caminho = SAIDA / "resultados.csv"
-    if caminho.exists():
-        return pd.read_csv(caminho)
-    global PROVISORIO
-    PROVISORIO = True
-    from e2._provisorio import resultados_sinteticos
-    return resultados_sinteticos()
+    if not caminho.exists():
+        sys.exit("falta %s; rode antes python src/executar_e2.py"
+                 % caminho.relative_to(RAIZ).as_posix())
+    return pd.read_csv(caminho)
 
 
 def main():
@@ -94,8 +77,6 @@ def main():
 
     figura_limiar(lim)
     figura_temporal(temp)
-    if PROVISORIO:
-        print("ATENCAO: rodada provisoria, com substitutos locais. Nao cite estes numeros.")
 
 
 def figura_limiar(lim):

@@ -214,6 +214,11 @@ As doze piores, da 133ª à 144ª, são exatamente as doze que aplicam PCA sem n
 2,0 colunas chegando ao classificador: são os pontos depois do salto na figura. As melhores têm em
 comum o encoding pelo alvo e alguma normalização.
 
+A combinação do topo aplica PCA, e a §5.2 conclui que a redução não venceu em nenhum contexto. As
+duas coisas convivem porque a posição no ranking vem da média e o veredito vem do pareado: a mesma
+combinação sem o PCA fica em 0,848, dentro do desvio. Ocupar o primeiro lugar não é o mesmo que ter
+chegado lá por causa de uma etapa.
+
 # 5.2 · Efeito isolado de cada etapa
 
 
@@ -369,10 +374,11 @@ no meio por depender do máximo do treino, que o teste ultrapassa. E as seis com
 empatam com a melhor em cinco folds e se separam no futuro, de 0,738 a 0,799: empate sob um
 protocolo não é equivalência sob outro.
 
-**Troca do corte do alvo.** Entre os rankings em P50, P75 e P90 a correlação de Spearman é de 0,825
-entre P50 e P75, 0,867 entre P75 e P90 e 0,664 entre os extremos, todas significativas. Nos três
-cortes as combinações com normalização e encoding pelo alvo ficam entre 0,770 e 0,880, e as de PCA
-sem normalização entre 0,711 e 0,750.
+**Troca do corte do alvo.** Entre os rankings destas doze em P50, P75 e P90 a correlação de Spearman
+é de 0,825 entre P50 e P75, 0,867 entre P75 e P90 e 0,664 entre os extremos, todas significativas.
+Nos três cortes as combinações com normalização e encoding pelo alvo ficam entre 0,770 e 0,880, e as
+de PCA sem normalização entre 0,711 e 0,750. São doze pontos, então a conclusão é sobre a separação
+entre esses grupos, não sobre a ordem das 144.
 
 **Desempenho por gênero.**
 
@@ -380,6 +386,9 @@ sem normalização entre 0,711 e 0,750.
 |---|---|---|---|---|---|
 | ficção | 1.627 | 35,6% | 0,813 | 0,832 | 0,826 |
 | documentário | 908 | 5,6% | 0,699 | 0,693 | 0,118 |
+
+Os dois gêneros cobrem 2.535 dos 2.590 filmes; os 55 restantes são 54 de animação e um videomusical,
+pouco para medir separado.
 
 O agregado esconde a limitação mais séria: em documentário a AUC cai cerca de 0,13 e a melhor
 combinação encontra menos de um em cada oito sucessos. Com prevalência de 5,6%, menos de um dos
