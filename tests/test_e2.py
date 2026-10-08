@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Testes rapidos da Entrega 2: alvo, folds e as etapas de ausentes e encoding.
+"""Testes rapidos da Entrega 2: alvo, folds, etapas, robustez, anexo e analise.
 
 Executar: python -m unittest discover -s tests
-
-Os testes da grade completa ficam pulados enquanto normalizacao, reducao e
-balanceamento nao existirem em src/e2/etapas, e passam a rodar quando entrarem.
 """
 
-import importlib.util
 import itertools
 import sys
 import unittest
@@ -19,14 +15,9 @@ import pandas as pd
 from sklearn.pipeline import make_pipeline
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from e2 import anexo, base, espaco, robustez  # noqa: E402
-from e2.etapas import ausentes, balanceamento, encoding  # noqa: E402
+from e2 import analise, anexo, base, espaco, robustez  # noqa: E402
+from e2.etapas import ausentes, balanceamento, encoding, normalizacao, reducao  # noqa: E402
 from e2.metricas import SCORING  # noqa: E402
-
-GRADE_COMPLETA = all(
-    importlib.util.find_spec("e2.etapas." + etapa) is not None
-    for etapa in ("normalizacao", "reducao", "balanceamento")
-)
 
 
 class TestAlvo(unittest.TestCase):
@@ -119,13 +110,13 @@ class TestEtapasDaE2(unittest.TestCase):
         self.assertGreater(self.aplica("mediana_moda", "onehot").shape[1], 4 * len(base.ATRIBUTOS))
 
     def test_cada_chamada_devolve_objeto_novo(self):
-        for modulo in (ausentes, encoding, balanceamento):
+        for modulo in (ausentes, encoding, normalizacao, reducao, balanceamento):
             for fabrica in modulo.OPCOES.values():
                 if fabrica() != "passthrough":
                     self.assertIsNot(fabrica(), fabrica())
 
     def test_toda_opcao_tem_justificativa(self):
-        for modulo in (ausentes, encoding, balanceamento):
+        for modulo in (ausentes, encoding, normalizacao, reducao, balanceamento):
             self.assertEqual(set(modulo.OPCOES), set(modulo.JUSTIFICATIVA))
 
     def test_codigo_do_baseline(self):
@@ -167,13 +158,65 @@ class TestRobustezEAnexo(unittest.TestCase):
         self.assertEqual(tabela["AUC"].iloc[-1], "—")
 
 
-@unittest.skipUnless(GRADE_COMPLETA, "faltam etapas da grade em src/e2/etapas")
 class TestGradeCompleta(unittest.TestCase):
     def test_sao_144_combinacoes_com_um_unico_baseline(self):
         todas = espaco.combinacoes()
         self.assertEqual(len(todas), 144)
         self.assertEqual([c["id"] for c in todas], list(range(1, 145)))
         self.assertEqual(sum(espaco.eh_baseline(c) for c in todas), 1)
+
+
+def grade_plantada():
+    """As 144 combinacoes com dois efeitos conhecidos e nenhum ruido.
+
+    Normalizar soma 0,04 em qualquer contexto, e o PCA tira 0,06 so quando nao ha
+    normalizacao. O resto nao muda nada.
+    """
+    linhas = []
+    for c in espaco.combinacoes():
+        auc = 0.80 + 0.04 * (c["normalizacao"] != "sem")
+        auc -= 0.06 * (c["reducao"] == "pca" and c["normalizacao"] == "sem")
+        linha = {"id": c["id"], "codigo": espaco.codigo(c), **{e: c[e] for e in espaco.ETAPAS},
+                 "eh_baseline": int(espaco.eh_baseline(c)), "n_atributos": 18.0,
+                 "tempo_total_s": 1.0, "erro": None}
+        for m in SCORING:
+            linha[m + "_media"], linha[m + "_dp"] = auc, 0.01
+        linhas.append(linha)
+    return pd.DataFrame(linhas)
+
+
+class TestAnalise(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.grade = grade_plantada()
+
+    def test_regra_de_empate(self):
+        a = {"roc_auc_media": 0.80, "roc_auc_dp": 0.01}
+        self.assertTrue(analise.empata(a, {"roc_auc_media": 0.805, "roc_auc_dp": 0.002}, "roc_auc"))
+        self.assertFalse(analise.empata(a, {"roc_auc_media": 0.82, "roc_auc_dp": 0.002}, "roc_auc"))
+
+    def test_recupera_o_efeito_plantado_da_normalizacao(self):
+        efeito = analise.efeito_por_etapa(self.grade, "normalizacao").set_index("opcao")
+        for opcao in ("padrao", "minmax", "robusto"):
+            self.assertEqual(efeito.loc[opcao, "vitorias"], 36)
+            self.assertEqual(efeito.loc[opcao, "derrotas"], 0)
+
+    def test_etapa_sem_efeito_so_empata(self):
+        efeito = analise.efeito_por_etapa(self.grade, "encoding").set_index("opcao")
+        self.assertEqual(efeito.loc["alvo", "empates"], 72)
+
+    def test_acha_a_interacao_plantada_e_nenhuma_outra(self):
+        tabela = analise.interacoes(self.grade, "reducao", "normalizacao").set_index(["opcao_a", "opcao_b"])
+        self.assertEqual(tabela.loc[("pca", "sem"), "veredito"], "perde")
+        self.assertEqual(tabela.loc[("pca", "padrao"), "veredito"], "empata")
+        self.assertTrue(tabela.loc[("pca", "sem"), "interacao"])
+        self.assertFalse(tabela.loc[("kbest", "sem"), "interacao"])
+
+    def test_ranking_comeca_pela_melhor_e_inclui_o_baseline(self):
+        r = analise.ranking(self.grade)
+        self.assertEqual(r["roc_auc_media"].iloc[0], r["roc_auc_media"].max())
+        self.assertEqual(len(r), 144)
+        self.assertTrue(r["empata_com_a_melhor"].iloc[0])
 
 
 if __name__ == "__main__":
