@@ -2,84 +2,53 @@
 
 > Dona: Ana Raquel; parágrafo de métricas: Laura · Orçamento: 0,75 página
 
-As 144 combinações foram avaliadas com os mesmos cinco folds, pela mesma semente e na mesma
-ordem de etapas. É essa uniformidade que autoriza comparar duas linhas da tabela de
-resultados e atribuir a diferença ao pré-processamento.
+As 144 combinações foram avaliadas com os mesmos cinco folds, pela mesma semente e na mesma ordem
+de etapas. É essa uniformidade que autoriza comparar duas linhas da tabela e atribuir a diferença
+ao pré-processamento.
 
-## 4.1 Validação
+**Validação.** Divisão estratificada em cinco folds, embaralhada, semente 42, gerada uma única vez
+e gravada com o fold de cada um dos 2.590 filmes; a grade e a robustez recebem essa lista e não
+reconstroem a partição. Todos os folds ficam perto de 25,3% de positivos. A E1 defendeu partição
+temporal e o enunciado fixa cinco folds: seguimos o enunciado, e a partição temporal entra na §6.
 
-`StratifiedKFold(n_splits=5, shuffle=True, random_state=42)`, gerado uma única vez em
-`e2/base.py` e gravado em `reports/e2/folds.csv` com o fold de cada um dos 2.590 filmes. A
-grade e a análise de robustez recebem essa lista de índices e não reconstroem a partição. A
-estratificação é pelo alvo, de modo que todos os folds ficam perto de 25,3% de positivos.
+**Ajuste apenas no treino.** As cinco etapas vivem dentro de um pipeline construído de novo para
+cada combinação e cada fold, de modo que medianas, categorias e médias dos encodings, parâmetros de
+escala e eixos do PCA são estimados no treino do fold e aplicados ao teste. Usamos o pipeline da
+biblioteca de reamostragem por ser o único que aceita um reamostrador no meio da sequência e o
+aciona apenas no ajuste, de modo que o fold de teste nunca é reamostrado.
 
-A E1 defendeu partição temporal, e o enunciado da E2 fixa 5-fold. Seguimos o enunciado, e a
-partição temporal entra na §6 como análise de robustez.
-
-## 4.2 Ajuste só no treino
-
-Todas as cinco etapas vivem dentro de um `imblearn.pipeline.Pipeline`, construído de novo
-para cada combinação e cada fold. Mediana de imputação, categorias do one-hot, médias do
-encoding pelo alvo, parâmetros de escala e eixos do PCA são estimados no treino do fold e
-aplicados ao teste. O `Pipeline` do `imbalanced-learn` foi escolhido por ser o único que
-aceita um sampler no meio da sequência e o aciona apenas no `fit`, de modo que o fold de
-teste não é reamostrado nem pela subamostragem nem pelo SMOTE.
-
-## 4.3 A ordem das etapas
+**Ordem das etapas dentro de cada fold.**
 
 ```
-ausentes → encoding → normalização → redução → balanceamento → kNN(k=7)
+ausentes → encoding → normalização → redução → balanceamento → kNN de 7 vizinhos
 ```
 
-| posição | motivo |
-|---|---|
-| ausentes antes de encoding | o encoder não aceita `NaN`, e a categoria ausente precisa existir antes de virar coluna |
-| normalização depois de encoding | o kNN mede distância na matriz inteira, dummies incluídas; normalizar só as numéricas esconderia a interação entre encoding e normalização |
-| redução antes de balanceamento | PCA e seleção são ajustados apenas com filmes reais; depois do SMOTE, pontos sintéticos definiriam os eixos |
-| balanceamento por último | o SMOTE interpola no mesmo espaço em que o kNN vai medir distância |
+Ausentes primeiro porque o codificador não aceita valor ausente. Normalização depois do encoding
+porque o kNN mede distância na matriz inteira. Redução antes do balanceamento para que os eixos
+sejam ajustados só com filmes reais. Balanceamento por último porque o SMOTE interpola no mesmo
+espaço em que o kNN vai medir distância. O classificador tem sete vizinhos, pesos uniformes e
+distância euclidiana, fixado pelo enunciado.
 
-`KNeighborsClassifier(n_neighbors=7)`, pesos uniformes, distância euclidiana e o restante nos
-valores padrão. O classificador é fixado pelo enunciado para que toda diferença entre
-combinações venha do pré-processamento.
+**Métricas.** *[parágrafo da Laura, ver `4-metricas.md`]*
 
-## 4.4 Métricas
+**Regra de empate.** Duas combinações empatam numa métrica quando a diferença entre as médias é
+menor que o maior dos dois desvios entre folds. A regra atende à exigência do enunciado de que
+diferença menor que a variabilidade entre folds não sustente conclusão, tem uma única implementação
+no código e é conservadora, porque gera mais empates do que um teste pareado geraria. A §5.2
+acrescenta um Wilcoxon pareado como verificação independente.
 
-*[parágrafo da Laura, ver `4-metricas.md`]*
+**Reprodutibilidade.** Rodar a grade duas vezes no mesmo ambiente produz as mesmas métricas em
+todos os folds, o que confirma que nenhum transformador ficou sem semente. As versões das
+bibliotecas estão no anexo, gravadas pela própria execução, e nenhum número deste relatório foi
+digitado à mão.
 
-## 4.5 Reprodutibilidade
+**O teste de que o histórico não vaza.** Os três históricos são o único ponto em que informação de
+um filme passa por outro, e por isso recebem verificação própria em vez de argumento. O teste
+multiplica por mil o público de todos os filmes de um ano e confere que nenhum histórico daquele ano
+ou anterior muda, o que falharia se o histórico olhasse para o próprio ano, e que algum histórico de
+ano posterior muda, o que garante que o teste toca a coluna.
 
-| garantia | como |
-|---|---|
-| semente única | `base.SEMENTE = 42`, repassada a todo objeto com `random_state` |
-| folds materializados | `reports/e2/folds.csv` |
-| versões das bibliotecas | `reports/e2/ambiente.json`, gravado pela própria execução |
-| retomada sem perder trabalho | cada combinação é gravada assim que termina; ao reiniciar, as que terminaram sem erro são puladas e as que falharam voltam para a fila |
-| falha é resultado | combinação que lança exceção vira linha com métricas vazias e a mensagem na coluna `erro`, e não derruba a grade |
-| nenhum número à mão | todo valor citado no relatório vem de arquivo em `reports/e2/` |
-
-O critério de aceite da execução é que rodar a grade duas vezes produza exatamente os mesmos
-números. Se isso não ocorrer, há semente faltando em algum transformador. A verificação foi
-feita por combinação durante a construção do motor e repetida na grade completa: as duas
-execuções das 144 combinações deram as mesmas métricas em todos os folds.
-
-## 4.6 O teste de que o histórico não vaza
-
-Os três atributos `hist_*` são o único ponto do pré-processamento em que informação de um
-filme passa por outro, e por isso recebem uma verificação própria em vez de um argumento. O
-teste multiplica por mil o público de todos os filmes de um ano t e verifica duas condições:
-
-1. nenhum `hist_*` de filme com ano ≤ t muda, condição que falharia se o histórico olhasse
-   para o próprio ano;
-2. algum `hist_*` de filme com ano > t muda, o que garante que o teste de fato toca a coluna.
-
-O teste roda para t em {2005, 2012, 2019}, dentro de `base.checar_nao_vazamento()`, e
-interrompe a execução de `base.py` se qualquer das duas condições quebrar.
-
-Resta uma limitação, que declaramos. Com k-fold aleatório, o público de um filme do fold de
-teste pode compor o `hist_*` de um filme posterior do fold de treino. O rótulo do próprio
-filme de teste nunca entra nos atributos dele, mas essa contaminação indireta entre folds
-existe. Ela decorre de o enunciado fixar partição aleatória, e é o que a partição temporal da
-§6 verifica.
-
-O código do protocolo está em `src/e2/base.py`, `src/e2/espaco.py` e `src/executar_e2.py`. Os
-arquivos gerados são `reports/e2/folds.csv` e `reports/e2/ambiente.json`.
+Resta uma limitação, que declaramos: com divisão aleatória, o público de um filme do fold de teste
+pode compor o histórico de um filme posterior do fold de treino. O rótulo do próprio filme de teste
+nunca entra nos atributos dele, mas essa contaminação indireta existe, decorre de o enunciado fixar
+partição aleatória, e é o que a validação temporal da §6 mede.

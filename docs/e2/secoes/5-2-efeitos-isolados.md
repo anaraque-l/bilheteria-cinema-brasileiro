@@ -2,13 +2,11 @@
 
 > Dona: cada uma as suas etapas, com as tabelas da Ana Laura · Orçamento: parte das 4,0 páginas da §5
 
-A tabela traz as duas leituras que o módulo de análise produz para cada etapa. A primeira é a que
-o enunciado pede, a média das combinações agrupadas pela opção adotada, e tem um defeito
-conhecido: mistura contextos, porque a média de uma opção inclui combinações em que as outras
-quatro etapas diferem. A segunda corrige isso por pareamento, fixando as outras quatro etapas e
-comparando a opção com a de referência dentro de cada contexto, com vitória, empate ou derrota
-decididos pela regra de empate da §4. É a contagem pareada que sustenta afirmação, e é ela que
-autoriza dizer que uma técnica nunca piorou.
+A tabela traz as duas leituras do módulo de análise. A primeira é a que o enunciado pede, a média
+das combinações agrupadas pela opção, e tem o defeito de misturar contextos. A segunda corrige
+isso por pareamento: fixa as outras quatro etapas e compara a opção com a de referência dentro de
+cada contexto, com vitória, empate ou derrota decididos pela regra da §4. É a contagem pareada que
+sustenta afirmação, e é ela que autoriza dizer que uma técnica nunca piorou.
 
 | etapa | opção | AUC média | pareado contra a referência |
 |---|---|---|---|
@@ -28,62 +26,62 @@ autoriza dizer que uma técnica nunca piorou.
 | | SMOTE | 0,814 | 1 vitória, 41 empates, 6 derrotas em 48 |
 
 **A normalização é a única etapa que decide o resultado.** As três técnicas somam 68 vitórias, 40
-empates e nenhuma derrota em 108 comparações pareadas, perfil que nenhuma outra etapa tem, com
-ganho médio entre 0,036 e 0,041. A explicação está na métrica do classificador: a distância
-euclidiana soma diferenças sem normalizar unidades, e aqui a contagem de filmes anteriores da
-distribuidora varia de zero a 179 enquanto os indicadores de fomento variam de zero a um. Sem
-correção, dois filmes são próximos quando têm distribuidoras de porte parecido, e o resto é
-arredondamento. As três técnicas empatam entre si, com diferença máxima de 0,004 contra desvio
-típico de 0,014 entre folds: o que importa é normalizar, não qual escala escolher.
+empates e nenhuma derrota em 108 comparações pareadas, com ganho médio entre 0,036 e 0,041. A
+explicação está na métrica do classificador: a distância euclidiana soma diferenças sem normalizar
+unidades, e aqui a contagem de filmes anteriores da distribuidora varia de zero a 179 enquanto os
+indicadores de fomento variam de zero a um. Sem correção, dois filmes são próximos quando têm
+distribuidoras de porte parecido, e o resto é arredondamento. As três escalas empatam entre si,
+com diferença máxima de 0,004 contra desvio típico de 0,014 entre folds: o que importa é
+normalizar, não qual escala escolher.
 
-**A redução nunca ganhou.** Nem o PCA nem a seleção venceram a ausência de redução em um único
-contexto, e o PCA perdeu em doze. A H13 da E1 sobrevive, agora testada com o modelo sensível à
-dimensão que era a nossa objeção contra ela. Há, porém, um achado de engenharia: a seleção empata
-com a matriz completa em 43 dos 48 contextos, e nesses casos o kNN decide com dez colunas em vez
-das cerca de cinquenta que chegam sem redução. Não se ganha AUC reduzindo, mas se pode pagar
-menos por ela.
+**A redução nunca ganhou.** Nem o PCA nem a seleção venceram em um único contexto, e o PCA perdeu
+em doze. A H13 da E1 sobrevive, agora testada com o modelo sensível à dimensão que era a nossa
+objeção contra ela. Há, porém, um achado de engenharia: a seleção empata com a matriz completa em
+43 dos 48 contextos, e nesses casos o kNN decide com dez colunas em vez de cerca de cinquenta.
 
 **O encoding pelo alvo tem vantagem pequena e consistente.** A diferença média, 0,007, é menor que
-o desvio entre folds, e portanto é empate pela nossa regra. O pareamento, contudo, mostra 13
-vitórias e nenhuma derrota em 72 contextos, padrão difícil de atribuir ao acaso: a leitura honesta
-é que o efeito existe e é pequeno. O mecanismo é dimensional, porque o encoding pelo alvo entrega
-dezoito colunas ao classificador contra cerca de 84 do one-hot, e em dimensão menor as distâncias
-discriminam melhor.
+o desvio entre folds e portanto é empate pela nossa regra; o pareamento mostra 13 vitórias e
+nenhuma derrota em 72 contextos, padrão difícil de atribuir ao acaso. A leitura honesta é que o
+efeito existe e é pequeno. O mecanismo é dimensional: dezoito colunas contra cerca de 84, e em
+dimensão menor as distâncias discriminam melhor.
 
-**A indicadora de ausência não acrescentou nada**, e isso refuta a hipótese da §3.1: zero
-vitórias e quatro derrotas em 72 contextos. A explicação mais plausível é que a informação já
-estava na base, porque a falta de histórico coincide com a contagem de filmes anteriores igual a
-zero em quase todos os casos, e essa contagem é um atributo numérico que o kNN já usa. A
-indicadora repete em sete colunas novas aquilo que três colunas antigas diziam, e em dimensão as
-colunas repetidas custam sem informar. O critério que fica é verificar, antes de criar indicadora
-de ausência, se algum atributo existente já mede o mesmo fenômeno.
+**A indicadora de ausência não acrescentou nada**, o que refuta a hipótese da §3.1: zero vitórias e
+quatro derrotas em 72 contextos. A informação já estava na base, porque a falta de histórico
+coincide com a contagem de filmes anteriores igual a zero em quase todos os casos, e essa contagem
+é um atributo numérico que o kNN já usa. A indicadora repete em sete colunas novas o que três
+colunas antigas diziam, e colunas repetidas custam dimensão sem informar.
 
-**O balanceamento não move a AUC**, como a §4 previu, e é por isso que a discussão dele precisa
-de outra métrica. É também onde a nossa hipótese se confirma de forma mais nítida em todo o
-trabalho.
+**O balanceamento não move a AUC e muda a decisão**, como a §4 previu.
 
-| métrica | sem balanceamento | subamostragem | SMOTE | pareado contra não balancear |
+| métrica | sem | subamostragem | SMOTE | pareado contra não balancear |
 |---|---|---|---|---|
-| revocação | 0,548 | 0,741 | 0,736 | 48 vitórias em 48, para as duas técnicas |
+| revocação | 0,548 | 0,741 | 0,736 | 48 vitórias em 48, para as duas |
 | precisão | 0,692 | 0,543 | 0,530 | 48 derrotas em 48, para as duas |
 | acurácia | 0,825 | 0,774 | 0,767 | 48 derrotas em 48, para as duas |
-| F1 | 0,609 | 0,625 | 0,615 | subamostragem: 15 vitórias, 33 empates, 0 derrotas |
-| AUC | 0,822 | 0,821 | 0,814 | subamostragem: 0 vitórias, 44 empates, 4 derrotas |
+| F1 | 0,609 | 0,625 | 0,615 | subamostragem: 15 vitórias, 33 empates |
+| AUC | 0,822 | 0,821 | 0,814 | subamostragem: 44 empates, 4 derrotas |
 
-Balancear aumenta a revocação em cerca de 0,19 em todos os 48 contextos, sem uma única exceção, e
-cobra por isso 0,15 de precisão e 0,05 de acurácia, também sem exceção. O F1 sobe pouco e a AUC
-não se move, que é exatamente o que o mecanismo prevê: a AUC avalia a ordenação dos filmes, que o
-balanceamento não altera, enquanto revocação e precisão avaliam a decisão tomada no corte de
-quatro votos em sete, que é o que a mudança de proporção no treino desloca.
+Balancear aumenta a revocação em cerca de 0,19 em todos os 48 contextos e cobra 0,15 de precisão e
+0,05 de acurácia, também sem exceção. É o que o mecanismo prevê: a AUC avalia a ordenação, que o
+balanceamento não altera, enquanto revocação e precisão avaliam a decisão tomada no corte de quatro
+votos em sete. Entre as duas técnicas a subamostragem domina o SMOTE, ganhando em F1 em quinze
+contextos sem nunca perder, enquanto o SMOTE perde em sete. É contraintuitivo, porque a
+subamostragem descarta metade dos filmes de cada treino; a explicação provável é o espaço em que o
+SMOTE opera, interpolando numa matriz com colunas de indicadores e produzindo filmes com meia
+distribuidora, que entram na votação como se fossem reais.
 
-Entre as duas técnicas, a subamostragem domina o SMOTE: ganha em F1 em quinze contextos sem nunca
-perder, enquanto o SMOTE perde em sete. É contraintuitivo, porque a subamostragem descarta cerca
-de metade dos filmes de cada treino e o SMOTE não descarta nada. A explicação provável está no
-espaço em que o SMOTE opera: ele interpola entre sucessos vizinhos numa matriz que contém colunas
-de indicadores, e a interpolação produz valores fracionários em colunas que só deveriam valer zero
-ou um, isto é, filmes com meia distribuidora, que entram na votação dos sete como se fossem reais.
+**Verificação independente.** A regra de empate é o critério do enunciado, e é por ela que o
+relatório decide. Como checagem, aplicamos também o teste de Wilcoxon pareado sobre as diferenças
+por fold, aproveitando que os folds são idênticos em todas as combinações.
 
-A decisão prática depende do uso. Para ordenar filmes por risco, balancear não traz nada. Para
-decidir quais filmes merecem atenção, a subamostragem troca precisão por revocação numa proporção
-que compensa quando deixar de ver um sucesso custa mais do que examinar um fracasso à toa, o que é
-plausível no contexto de política de fomento que motiva o trabalho.
+| afirmação | n | diferença média | p |
+|---|---|---|---|
+| padronização contra não normalizar | 180 | +0,041 | 3 · 10⁻²⁸ |
+| escala por intervalo contra não normalizar | 180 | +0,036 | 1 · 10⁻²⁴ |
+| escala robusta contra não normalizar | 180 | +0,038 | 7 · 10⁻²⁷ |
+| subamostragem em revocação | 240 | +0,194 | 4 · 10⁻⁴¹ |
+| subamostragem em precisão | 240 | −0,150 | 4 · 10⁻⁴¹ |
+| subamostragem em AUC | 240 | −0,001 | 0,26 |
+
+As afirmações fortes passam com margem larga, e a única comparação não significativa é justamente
+a que afirmamos ser nula, o efeito do balanceamento na AUC.
