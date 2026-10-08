@@ -21,3 +21,8 @@ entre folds sustente, e 21 empatam com a melhor. O que a grade autoriza afirmar 
 As doze piores, da 133ª à 144ª, são exatamente as doze que aplicam PCA sem normalização, todas com
 2,0 colunas chegando ao classificador: são os pontos depois do salto na figura. As melhores têm em
 comum o encoding pelo alvo e alguma normalização.
+
+A combinação do topo aplica PCA, e a §5.2 conclui que a redução não venceu em nenhum contexto. As
+duas coisas convivem porque a posição no ranking vem da média e o veredito vem do pareado: a mesma
+combinação sem o PCA fica em 0,848, dentro do desvio. Ocupar o primeiro lugar não é o mesmo que ter
+chegado lá por causa de uma etapa.
