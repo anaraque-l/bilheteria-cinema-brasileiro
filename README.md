@@ -55,6 +55,7 @@ percentil 69. Por isso a Entrega 2 usa o percentil 75 do ano anterior como alvo.
 │   ├── executar_e2.py         Entrega 2: roda as 144 combinacoes
 │   ├── analisar_e2.py         Entrega 2: tabelas e figuras da analise
 │   ├── robustez_e2.py         Entrega 2: as tres checagens de robustez
+│   ├── montar_relatorio_e2.py Entrega 2: junta as secoes no relatorio .md e .docx
 │   └── e2/                    Entrega 2: base, folds, combinacoes e etapas
 ├── notebooks/                 notebooks das Entregas 1 e 2, executados
 ├── docs/
@@ -67,6 +68,8 @@ percentil 69. Por isso a Entrega 2 usa o percentil 75 do ano anterior como alvo.
 │   ├── roteiro-apresentacao.md roteiro da apresentacao da Entrega 1
 │   └── e2/
 │       ├── relatorio-entrega2.md  relatorio da Entrega 2, montado a partir das secoes
+│       ├── Relatorio_Entrega_2_Grupo_11.docx  o mesmo relatorio, versao de entrega
+│       ├── estilo-relatorio.docx  modelo de estilos do .docx
 │       ├── hipoteses-balanceamento.md  o que esperavamos antes da grade e o veredito
 │       └── secoes/            uma secao por arquivo, com a dona de cada uma
 ├── data/
@@ -183,13 +186,15 @@ python src/executar_e2.py     # roda as 144, cerca de 4 minutos; retoma de onde 
 python src/analisar_e2.py     # empate, ranking, efeitos, interacoes, custo e figuras
 python src/robustez_e2.py     # particao temporal, cortes P50 e P90, e por genero
 python src/e2/anexo.py        # tabela das 144 para o anexo
+python src/montar_relatorio_e2.py --docx  # junta as secoes no relatorio; o .docx pede pandoc
 ```
 
 A grade rodou sem nenhuma combinação com erro, e rodá-la duas vezes dá as mesmas métricas.
 
 Entregáveis da Entrega 2: o notebook em `notebooks/`, que refaz a grade e confere que ela
-bate com `reports/e2/resultados.csv`, o relatório em `docs/e2/relatorio-entrega2.md` e as
-figuras em `reports/figuras/e2/`.
+bate com `reports/e2/resultados.csv`, o relatório em `docs/e2/` (versão em Markdown e
+versão de entrega em `.docx`, com o corpo em menos de dez páginas) e as figuras em
+`reports/figuras/e2/`.
 
 Os resultados vão para `reports/e2/`: `resultados.csv` com uma linha por combinação,
 `resultados_por_fold.csv` com uma por combinação e fold, `folds.csv` e `ambiente.json`

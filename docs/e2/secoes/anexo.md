@@ -1,4 +1,4 @@
-# Anexo · Tabela das 144, versões, folds
+# Anexo · Tabela das 144, ambiente, folds, atributos e tabelas de apoio
 
 > Dona: Laura · Orçamento: não conta
 
@@ -10,6 +10,8 @@ uma das cinco etapas, média e desvio das seis métricas, o número de colunas q
 classificador, o tempo de execução e a coluna de erro. A mesma tabela em valores separados por
 vírgula, no mesmo diretório, serve para importar no documento final sem digitação. A coluna de
 erro está vazia nas 144 linhas: nenhuma combinação falhou.
+
+<!-- tabela: reports/e2/anexo_144.md -->
 
 ## B · Ambiente de execução
 
@@ -74,3 +76,50 @@ vem do pré-processamento e não da divisão dos dados.
 | robustez | `src/e2/robustez.py` |
 | tabela deste anexo | `src/e2/anexo.py` |
 | testes | `tests/test_e1.py` e `tests/test_e2.py` |
+
+## F · Os 18 atributos e o que ficou fora
+
+| grupo | colunas | n |
+|---|---|---|
+| numéricas | `ano`, `filmes_diretor_antes`, `filmes_distribuidora_antes`, `filmes_produtora_antes`, `coproducao`, `recebeu_fsa`, `recebeu_incentivo`, `contratos_fsa`, `projetos_incentivo` | 9 |
+| numéricas de histórico | `hist_diretor`, `hist_distribuidora`, `hist_produtora` | 3 |
+| nominais | `genero`, `uf_maj`, `distribuidora`, `origem_do_fomento` | 4 |
+| ordinais | `experiencia_da_direcao`, `porte_da_distribuidora` | 2 |
+
+Cada exclusão aplica uma decisão já tomada na E1:
+
+| fora | motivo | origem |
+|---|---|---|
+| `publico`, `renda_*`, `max_salas`, `mediana_publico_do_ano`, `filmes_no_ano` | vazamento: só se conhecem depois da estreia | `build_dataset.COLUNAS_PROIBIDAS` |
+| `cpb`, `titulo` | identificador | idem |
+| `n_ufs` | moda em 97,1% dos filmes, efeito medido de 0,000 | H8 e S6 |
+| `uf_bruto`, `uf2_bruto` | malformadas, substituídas por `uf_maj` | H6 e P7 |
+| `direcao`, `produtora_maj`, `produtora_min` | 1.738, 1.502 e 714 categorias; o sinal entra pelos históricos | P5 |
+| `decada`, `deflator`, `populacao_br` | função do `ano`; `populacao_br` tem 23% de falha de junção | P8 |
+| `estreia_do_diretor` | redundante com `experiencia_da_direcao` | — |
+
+## G · Tabelas de apoio da §5
+
+Wilcoxon pareado sobre as diferenças por fold, contra a opção de referência, no mesmo contexto das
+outras quatro etapas e no mesmo fold. Calculado no notebook da Entrega 2.
+
+| afirmação | n | diferença média | p |
+|---|---|---|---|
+| padronização contra não normalizar, AUC | 180 | +0,041 | 3 · 10⁻²⁸ |
+| escala por intervalo contra não normalizar, AUC | 180 | +0,036 | 1 · 10⁻²⁴ |
+| escala robusta contra não normalizar, AUC | 180 | +0,038 | 7 · 10⁻²⁷ |
+| subamostragem, revocação | 240 | +0,194 | 4 · 10⁻⁴¹ |
+| subamostragem, precisão | 240 | −0,150 | 4 · 10⁻⁴¹ |
+| subamostragem, AUC | 240 | −0,001 | 0,26 |
+| PCA contra não reduzir sem normalização, AUC | 60 | −0,065 | 2 · 10⁻¹¹ |
+| PCA contra não reduzir com normalização, AUC | 180 | −0,002 | 0,003 |
+
+Tempo médio por combinação, ajuste e predição nos cinco folds, em `analise_custo_por_opcao.csv`.
+
+| etapa | opção mais barata | opção mais cara |
+|---|---|---|
+| ausentes | mediana e moda, 1,54 s | indicadora, 1,69 s |
+| encoding | pelo alvo, 1,02 s | one-hot, 2,21 s |
+| normalização | sem normalização, 1,33 s | padronização, 1,74 s |
+| redução | sem redução, 0,76 s | seleção de dez colunas, 2,60 s |
+| balanceamento | subamostragem, 1,56 s | SMOTE, 1,69 s |
