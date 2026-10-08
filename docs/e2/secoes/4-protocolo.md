@@ -59,7 +59,8 @@ combinações venha do pré-processamento.
 
 O critério de aceite da execução é que rodar a grade duas vezes produza exatamente os mesmos
 números. Se isso não ocorrer, há semente faltando em algum transformador. A verificação foi
-feita por combinação durante a construção do motor e será confirmada na grade completa.
+feita por combinação durante a construção do motor e repetida na grade completa: as duas
+execuções das 144 combinações deram as mesmas métricas em todos os folds.
 
 ## 4.6 O teste de que o histórico não vaza
 

@@ -35,7 +35,7 @@ A contagem do one-hot oscila entre os folds porque o corte de frequência é rea
 treino: uma categoria com dez filmes pode ficar acima do corte num fold e abaixo em outro. A
 contagem do encoding pelo alvo não oscila, porque são sempre 12 numéricas, 4 nominais e 2
 ordinais. Com `mediana_indicadora` o encoding pelo alvo sobe para 25 colunas, sete
-indicadoras a mais, uma por atributo com ausência no treino; o one-hot sobe para 86, as
+indicadoras a mais, uma por atributo com ausência no treino; o one-hot sobe para até 86, média de 84, as
 mesmas sete mais a dummy da categoria `ausente` criada em `uf_maj` e em `origem_do_fomento`.
 
 A opção `onehot` é a técnica padrão e compõe o baseline. O corte `min_frequency=10` vem de
