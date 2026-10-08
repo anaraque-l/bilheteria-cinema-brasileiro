@@ -69,7 +69,6 @@ percentil 69. Por isso a Entrega 2 usa o percentil 75 do ano anterior como alvo.
 │   └── e2/
 │       ├── Relatorio_Entrega_2_Grupo_11.pdf  relatorio da Entrega 2, versao entregue
 │       ├── relatorio-entrega2.md  rascunho de trabalho, montado a partir das secoes
-│       ├── Relatorio_Entrega_2_Grupo_11.docx  o rascunho em .docx, gerado pelo script
 │       ├── estilo-relatorio.docx  modelo de estilos do .docx
 │       ├── hipoteses-balanceamento.md  o que esperavamos antes da grade e o veredito
 │       └── secoes/            uma secao por arquivo, com a dona de cada uma
