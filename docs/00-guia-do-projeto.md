@@ -40,7 +40,7 @@ A separação entre `build_dataset.py` e `sensibilidades.py` é a espinha do pro
 primeiro produz o que é **entregue**; o segundo produz **evidência sobre o que ainda
 não foi decidido**. Nenhuma transformação testada no segundo toca o primeiro.
 
-## Por que `data/raw` é versionado
+## Por que `data/raw` é versionado?
 
 Órgão público republica arquivo sem avisar — a própria edição `2024r` da ANCINE é uma
 retificação da `2024`. Versionar o bruto é o que garante que outra pessoa reproduza

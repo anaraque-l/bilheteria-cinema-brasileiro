@@ -4,6 +4,8 @@ Estas hipóteses foram escritas antes de rodarmos a grade completa. Depois da ro
 uma recebe um veredito na tabela do fim, e o texto original não é alterado. Assim fica
 registrado o que esperávamos e o que de fato aconteceu.
 
+## Hipóteses
+
 **1. Balancear aumenta a revocação e o F1 e diminui a precisão e a acurácia.**
 O kNN prevê sucesso quando pelo menos 4 dos 7 vizinhos são sucesso. Com mais sucessos no
 treino, esse número fica mais fácil de alcançar. O modelo passa a apontar mais filmes como
@@ -28,6 +30,8 @@ balanceamento e normalização interagindo.
 **5. Com o corte em P90, o balanceamento faz mais diferença do que em P75.**
 Em P90 só cerca de 10% dos filmes são sucesso. Quanto mais rara a classe, mais difícil
 chegar a 4 votos de 7, e mais o balanceamento deve ajudar.
+
+## Tabela com o veredito 
 
 | hipótese | veredito | número |
 |---|---|---|
