@@ -1,5 +1,5 @@
 # Projeto CIN0144 - Sucesso de bilheteria do cinema brasileiro
-# Testado com Python 3.12.
+# Testado com Python 3.12 e 3.13.
 #
 # A ingestao usa so a biblioteca padrao (urllib). Nao ha dependencia de
 # `requests` de proposito: o pipeline roda em qualquer maquina do grupo
@@ -9,7 +9,7 @@ pandas>=2.0
 numpy>=1.26
 matplotlib>=3.8
 seaborn>=0.13
-scikit-learn>=1.4
+scikit-learn>=1.4,<1.11   # o TargetEncoder com shuffle e random state sai na 1.11, ver src/e2/etapas/encoding.py
 # Entrega 2: unico jeito de por um sampler dentro do pipeline sem que ele
 # toque o fold de teste. O SMOTE e a subamostragem so agem no ajuste.
 imbalanced-learn>=0.12

@@ -38,10 +38,10 @@ from sensibilidades import CAT_HONESTAS, NUM_HONESTAS, _pipeline, _rf  # noqa: E
 RAIZ = Path(__file__).resolve().parent.parent
 SAIDA = RAIZ / "reports"
 FIGURAS = SAIDA / "figuras"
+# A E1 usou semente 0 aqui e 42 em sensibilidades.py. Trocar mudaria as tabelas ja entregues.
 SEMENTE = 0
 
-# Paleta das outras onze figuras do relatorio: a figura nova precisa parecer da
-# mesma familia, senao o slide denuncia que foi feita depois.
+# Mesma paleta das outras onze figuras do relatorio.
 COR, COR2, CINZA = "#2b6cb0", "#c05621", "#4a5568"
 # Rotulo curto do eixo log: "1 mil" em vez de "1.000", senao as marcas colidem.
 CURTO = {1: "10", 2: "100", 3: "1 mil", 4: "10 mil", 5: "100 mil",
@@ -69,8 +69,13 @@ def definicoes(d):
     a mediana do proprio ano so e conhecida depois que o ano acaba.
     """
     p = d["publico"]
-    por_ano = lambda q: d.groupby("ano")["publico"].transform(lambda s: s.quantile(q))
-    defeito_prev = lambda q: d["ano"].map(d.groupby("ano")["publico"].quantile(q).shift(1))
+
+    def por_ano(q):
+        return d.groupby("ano")["publico"].transform(lambda s: s.quantile(q))
+
+    def do_ano_anterior(q):
+        return d["ano"].map(d.groupby("ano")["publico"].quantile(q).shift(1))
+
 
     dd = d.copy()
     janela = pd.Series(np.nan, index=d.index)
@@ -81,7 +86,7 @@ def definicoes(d):
     taxa = p / d["populacao_br"]
     fatia = p / d.groupby("ano")["publico"].transform("sum")
 
-    # A serie do IBGE nao cobre 9 dos 30 anos (1995-2000, 2007, 2010, 2022-2023):
+    # A serie do IBGE nao cobre 10 dos 30 anos, que sao 1995 a 2000, 2007, 2010, 2022 e 2023:
     # ano de Censo e os primeiros anos ficam de fora do agregado 6579. Onde nao
     # ha populacao, a definicao per capita e INDEFINIDA - nao "fracasso".
     sem_pop = d["populacao_br"].isna()
@@ -94,8 +99,8 @@ def definicoes(d):
         "ano_P50": p > por_ano(0.50),            # alvo atual: sucesso_no_ano
         "ano_P75": p > por_ano(0.75),
         "ano_P90": p > por_ano(0.90),
-        "anoANTERIOR_P50": p > defeito_prev(0.50),
-        "anoANTERIOR_P75": p > defeito_prev(0.75),
+        "anoANTERIOR_P50": p > do_ano_anterior(0.50),
+        "anoANTERIOR_P75": p > do_ano_anterior(0.75),
         "janela5a_P75": p > janela,
         "abs_50k": p >= 50_000,
         "abs_100k": p >= 100_000,
@@ -135,6 +140,28 @@ def distribuicao(d):
     return pd.DataFrame(linhas, columns=["estatistica", "valor"])
 
 
+def _mistura(v):
+    """Ajusta duas gaussianas a log10(publico) e devolve (pesos, centros, desvios, cruzamento).
+
+    Centros e desvios ficam em log10; o cruzamento volta em espectadores. Ele e o
+    ponto em que uma componente passa a dominar a outra. Se elas nao se cruzam
+    entre os centros, vira NaN em vez de interromper a analise.
+    """
+    X = np.log10(v).reshape(-1, 1)
+    g = GaussianMixture(2, random_state=SEMENTE).fit(X)
+    o = np.argsort(g.means_.ravel())
+    w, m, sd = g.weights_[o], g.means_.ravel()[o], np.sqrt(g.covariances_.ravel())[o]
+
+    def diferenca(t):
+        return w[0] * norm.pdf(t, m[0], sd[0]) - w[1] * norm.pdf(t, m[1], sd[1])
+
+    try:
+        cruzamento = 10 ** brentq(diferenca, m[0], m[1])
+    except ValueError:
+        cruzamento = np.nan
+    return w, m, sd, cruzamento
+
+
 def duas_populacoes(d):
     """A distribuicao de publico e uma mistura de duas populacoes?
 
@@ -143,22 +170,10 @@ def duas_populacoes(d):
     a outra. Esse ponto de cruzamento e um corte que os DADOS propoem, em vez
     de um quantil escolhido por nos.
     """
-    def ajustar(x):
-        X = np.log10(x.dropna().to_numpy()).reshape(-1, 1)
-        g = GaussianMixture(2, random_state=SEMENTE).fit(X)
-        ordem = np.argsort(g.means_.ravel())
-        w, m = g.weights_[ordem], g.means_.ravel()[ordem]
-        sd = np.sqrt(g.covariances_.ravel())[ordem]
-        f = lambda t: w[0] * norm.pdf(t, m[0], sd[0]) - w[1] * norm.pdf(t, m[1], sd[1])
-        try:
-            cruz = 10 ** brentq(f, m[0], m[1])
-        except ValueError:
-            cruz = np.nan
-        return w, 10 ** m, cruz
-
     linhas = []
     for rotulo, sub in [("1995-2024", d)] + [(str(k), g) for k, g in d.groupby("decada")]:
-        w, centros, cruz = ajustar(sub["publico"])
+        w, m, _, cruz = _mistura(sub["publico"].dropna().to_numpy())
+        centros = 10 ** m
         linhas.append({"periodo": rotulo, "n": len(sub),
                        "peso_circuito_limitado": w[0], "centro_circuito_limitado": centros[0],
                        "peso_lancamento_comercial": w[1], "centro_lancamento_comercial": centros[1],
@@ -259,37 +274,27 @@ def utilidade_preditiva(d, R):
 
 
 # ---------------------------------------------------------------------------
-
-# ---------------------------------------------------------------------------
 # Figura
 # ---------------------------------------------------------------------------
 
-def _mistura(v):
-    """Ajusta a mistura de duas gaussianas e devolve (pesos, centros, cruzamento).
-
-    Mesma conta de `duas_populacoes`, isolada porque a figura precisa tambem dos
-    parametros das curvas, nao so do cruzamento.
-    """
+def _bic(v):
+    """BIC de uma e de duas gaussianas em log10(publico). Menor e melhor."""
     X = np.log10(v).reshape(-1, 1)
-    g = GaussianMixture(2, random_state=SEMENTE).fit(X)
-    o = np.argsort(g.means_.ravel())
-    w, m, sd = g.weights_[o], g.means_.ravel()[o], np.sqrt(g.covariances_.ravel())[o]
-    f = lambda t: w[0] * norm.pdf(t, m[0], sd[0]) - w[1] * norm.pdf(t, m[1], sd[1])
-    return w, m, sd, 10 ** brentq(f, m[0], m[1])
+    return [GaussianMixture(k, random_state=SEMENTE).fit(X).bic(X) for k in (1, 2)]
 
 
 def figura(d):
     """fig12 - as duas populacoes da bilheteria, e a fronteira ao longo do tempo.
 
-    E a unica evidencia desta auditoria que precisa ser VISTA para convencer: no
-    painel da esquerda, a mediana cai DENTRO da populacao de circuito limitado.
-    Esse e o argumento contra o alvo atual, em uma imagem.
+    No painel da esquerda, a mediana cai dentro da populacao de circuito limitado;
+    no da direita, a fronteira e o centro comercial ficam estaveis ate 2019.
     """
     plt.rcParams.update({"figure.dpi": 110, "savefig.dpi": 160, "font.size": 10,
                          "axes.spines.top": False, "axes.spines.right": False,
                          "axes.grid": True, "grid.alpha": .25, "grid.linewidth": .6})
     x = np.log10(d["publico"].to_numpy())
     w, m, sd, cruz = _mistura(d["publico"].to_numpy())
+    bic_1, bic_2 = _bic(d["publico"].to_numpy())
     fig, axes = plt.subplots(1, 2, figsize=(13, 4.6))
 
     # --- painel 1: a mistura ------------------------------------------------
@@ -316,7 +321,7 @@ def figura(d):
     ax.set_xlabel("público (escala logarítmica)")
     ax.set_ylabel("densidade")
     ax.set_title("A bilheteria brasileira são duas populações, não uma\n"
-                 "mistura de 2 gaussianas ajusta melhor que 1 (BIC 8.260 vs. 8.358)",
+                 "mistura de 2 gaussianas ajusta melhor que 1 (BIC %s vs. %s)" % (ptbr(bic_2), ptbr(bic_1)),
                  loc="left", fontsize=11, fontweight="bold")
     ax.set_xticks(list(CURTO))
     ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: CURTO.get(int(round(v)), "")))

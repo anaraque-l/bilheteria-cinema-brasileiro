@@ -16,7 +16,8 @@ se sabe antes da estreia — e mostrar, com número, quanto custa fazer isso hon
 | 3 | [`02-decisoes-e-escopo.md`](02-decisoes-e-escopo.md) | antes de mexer em atributo ou alvo |
 | 4 | o notebook em `notebooks/` | a análise em si |
 | 5 | [`03-melhorias-e-tradeoffs.md`](03-melhorias-e-tradeoffs.md) | ao planejar a Entrega 2 |
-| 6 | [`relatorio-entrega1.md`](relatorio-entrega1.md) | o documento que vai ser entregue |
+| 6 | [`04-auditoria-do-alvo.md`](04-auditoria-do-alvo.md) | antes de discutir o que é "sucesso" |
+| 7 | [`relatorio-entrega1.md`](relatorio-entrega1.md) | o documento da Entrega 1 |
 
 ## As etapas do pipeline
 
@@ -31,6 +32,8 @@ se sabe antes da estreia — e mostrar, com número, quanto custa fazer isso hon
        +---> notebook da entrega  descreve, visualiza, diagnostica
        |
        +---> sensibilidades.py   mede o peso de cada decisao
+       |
+       +---> auditoria_alvo.py   questiona a definicao do alvo e grava reports/alvo_*.csv
 ```
 
 A separação entre `build_dataset.py` e `sensibilidades.py` é a espinha do projeto. O
@@ -58,11 +61,13 @@ número de lá será reportado como desempenho do trabalho. Isso é a Entrega 2.
 
 - **Duração do filme.** A ANCINE não publica. Viria do Wikidata (licença CC0), mas o
   endpoint não é alcançável neste ambiente. Registrado como melhoria M6.
-- **Orçamento e fomento recebido.** Existe em outro conjunto da ANCINE, com chave de
-  junção diferente (CPB). É a melhoria de maior impacto potencial — ver M1.
+- **Orçamento e valor do fomento.** Os arquivos de fomento da ANCINE trazem só o número
+  do contrato, não o valor. Entram `recebeu_fsa`, `recebeu_incentivo` e as contagens (M1,
+  implementada); o orçamento continua sem fonte pública.
 - **Data exata de estreia.** Sem ela, não dá para separar as salas decididas na estreia
   das salas ganhas por bom desempenho. É a razão de `max_salas` ser tratado como
-  vazamento provável, e não como atributo.
+  vazamento provável, e não como atributo. A bilheteria diária da ANCINE a traria para
+  2014 em diante (M7), e ela não entrou na base.
 
 ## Convenções de código
 
@@ -73,10 +78,12 @@ número de lá será reportado como desempenho do trabalho. Isso é a Entrega 2.
 - Toda URL mora em `src/fontes.py`. Nenhuma URL no notebook.
 - Fonte testada e **descartada** também entra no registro, em `fontes.DESCARTADAS`, com
   o motivo — evita que a próxima pessoa gaste a mesma tarde.
-- Sem dependência pesada nova: pandas, numpy, matplotlib, seaborn e scikit-learn. A
-  ingestão usa só a biblioteca padrão.
+- Dependência nova só com justificativa escrita: `scipy` (Spearman e mistura de gaussianas
+  na auditoria do alvo) e `imbalanced-learn` (único jeito de pôr um *sampler* dentro do
+  `Pipeline`, na Entrega 2). A ingestão usa só a biblioteca padrão.
 - Todo gráfico do notebook vem seguido de interpretação, e o notebook é executado de
   ponta a ponta antes de ser commitado.
+- Os testes ficam em `tests/` e rodam com `python -m unittest discover -s tests`.
 
 ## Os três atalhos proibidos
 
@@ -88,6 +95,11 @@ Antes de mexer em qualquer lista de atributos ou no protocolo de avaliação:
 | usar `max_salas` | é o máximo **atingido durante** a carreira, não na estreia | +0,108 de AUC |
 | usar `sucesso_global` sem ressalva | a mediana global embute o ano: 86% nos anos 1990 contra 26% nos 2020 | −0,062 ao trocar |
 
-E o *k-fold* aleatório é **+0,087 otimista** frente à partição temporal. O conjunto
-honesto de atributos está em `sensibilidades.NUM_HONESTAS` e `CAT_HONESTAS`; para
-acrescentar algo ali, prove antes que é conhecido antes da estreia.
+E o *k-fold* aleatório é **+0,087 otimista** frente à partição temporal.
+
+`sensibilidades.NUM_HONESTAS` e `CAT_HONESTAS` são o conjunto das medições da Entrega 1.
+Atenção: `NUM_HONESTAS` ainda contém `filmes_no_ano`, que a auditoria do alvo depois
+classificou como proibido (P15, `build_dataset.COLUNAS_PROIBIDAS`). Ele ficou para que
+as medições continuem reproduzindo os números entregues. Para montar um X novo, parta de
+`build_dataset.atributos_legitimos` ou da lista de `src/e2/base.py`, e para acrescentar
+algo prove antes que é conhecido antes da estreia.

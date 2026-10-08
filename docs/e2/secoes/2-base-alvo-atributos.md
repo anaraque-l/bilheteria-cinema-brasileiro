@@ -13,8 +13,9 @@ Nesta entrega, sucesso é público acima do percentil 75 dos filmes brasileiros 
 anterior.
 
 O alvo da E1 era a mediana global dos trinta anos. A auditoria da definição de sucesso
-mediu três problemas nessa escolha. O limiar global embute a inflação e o crescimento do
-parque de salas, de modo que um filme de 1997 e um de 2023 são avaliados pela mesma régua.
+mediu três problemas nessa escolha. O limiar global embute o ano: o número de lançamentos
+cresceu 14 vezes entre 1995 e 2024 e o público mediano por filme caiu 15 vezes, de modo que
+um filme de 1997 e um de 2023 são avaliados pela mesma régua.
 A mediana do próprio ano só é conhecida depois que todos os filmes do ano estrearam, o que a
 torna indisponível para prever antes da estreia. E a mediana cai dentro da população de
 filmes de circuito limitado, separando filmes que o mercado não distingue entre si. O
@@ -65,7 +66,7 @@ Cada exclusão abaixo aplica uma decisão já tomada na E1:
 | `decada`, `deflator`, `populacao_br` | função do `ano`; `populacao_br` tem 23% de falha de junção | P8 |
 | `estreia_do_diretor` | redundante com `experiencia_da_direcao` | — |
 
-Um `assert` em `e2/base.py` interrompe a execução se qualquer coluna de
+Uma verificação em `e2/base.py` interrompe a execução se qualquer coluna de
 `build_dataset.COLUNAS_PROIBIDAS` aparecer entre os atributos, de modo que a verificação não
 depende de alguém lembrar de fazê-la.
 

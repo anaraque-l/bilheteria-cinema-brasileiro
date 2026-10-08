@@ -138,15 +138,22 @@ def main():
         fold_csv.unlink(missing_ok=True)
 
     X, y, _ = base.carregar_xy()
-    pares = base.folds(gravar=True)
+    # a rodada rapida e de teste, entao nao pode reescrever o folds.csv oficial
+    pares = base.folds(gravar=not args.rapido)
     todas = espaco.combinacoes()
     if args.rapido:
         todas = selecao_rapida(todas)
     if args.so:
         todas = [c for c in todas if c["id"] == args.so]
 
-    # retomada: uma queda na combinacao 130 nao pode custar as 129 anteriores
-    feitas = set(pd.read_csv(resumo_csv)["id"]) if resumo_csv.exists() else set()
+    # retomada: uma queda na combinacao 130 nao pode custar as 129 anteriores; quem
+    # falhou volta para a fila, porque a falha pode ter sido da maquina e nao da combinacao
+    feitas = set()
+    if resumo_csv.exists():
+        anteriores = pd.read_csv(resumo_csv)
+        sem_erro = anteriores["erro"].isna()
+        feitas = set(anteriores.loc[sem_erro, "id"])
+        anteriores[sem_erro].to_csv(resumo_csv, index=False, encoding="utf-8")
     pendentes = [c for c in todas if c["id"] not in feitas]
     print("%d filmes, %d combinacoes, %d ja feitas, %d a rodar"
           % (len(y), len(todas), len(todas) - len(pendentes), len(pendentes)))

@@ -44,7 +44,7 @@ decididas na estreia das salas ganhas por bom desempenho. É a raiz de D6.
 
 **Alternativa descartada.** Regressão sobre o público em nível.
 
-**Por quê.** A assimetria é 10,0 e a curtose 135,3; o máximo é 4.342 vezes a mediana.
+**Por quê.** A assimetria é 10,0 e a curtose 135,2; o máximo é 4.342 vezes a mediana.
 Uma regressão nesse regime seria dominada por meia dúzia de blockbusters, e o erro
 médio diria mais sobre eles do que sobre os 2.600 filmes restantes.
 
@@ -86,7 +86,7 @@ um rascunho. Apagar `sucesso_global` esconderia a evidência que sustenta a deci
 
 **Decisão.** `renda_corrente` e `renda_deflacionada_2024` nunca entram como atributo.
 
-**Por quê.** Renda é público × preço do ingresso. ρ de Spearman com `publico` = **0,994**.
+**Por quê.** Renda é público × preço do ingresso. ρ de Spearman com `publico` = **0,994** (renda deflacionada; 0,985 na corrente).
 É a mesma variável em outra unidade.
 
 **Custo medido (S1).** Incluí-la leva o AUC de 0,832 para **0,993** — o modelo

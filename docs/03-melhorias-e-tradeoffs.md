@@ -3,7 +3,7 @@
 Este documento responde a três perguntas para cada decisão em aberto: **quanto vale**,
 **quanto custa** e **dá para fazer?**
 
-A primeira parte (S1–S6) traz o que já foi **medido**. A segunda (M1–M8) traz melhorias
+A primeira parte (S1–S6) traz o que já foi **medido**. A segunda (M1–M9) traz melhorias
 propostas, com impacto estimado e viabilidade avaliada.
 
 ---
@@ -120,15 +120,15 @@ Impacto estimado, custo e viabilidade. Ordenadas por relação impacto/custo.
 
 | # | melhoria | impacto esperado | custo | viabilidade |
 |---|---|---|---|---|
-| **M7** | **data de estreia + salas na 1ª semana** | **muito alto** | médio | 🟢 **destravada** |
-| M9 | ordinais a partir do histórico | médio | baixo | ✅ **IMPLEMENTADA** |
-| ~~M1~~ | ~~fomento público (FSA / leis de incentivo)~~ | alto | baixo | ✅ **IMPLEMENTADA** |
-| M2 | histórico de **sucesso** (não só de contagem) | alto | baixo | 🟢 imediata |
-| M3 | validação temporal com janela deslizante | médio | baixo | 🟢 imediata |
-| M4 | consolidar entidade fragmentada | médio | médio | 🟡 exige critério |
-| M5 | alvo alternativo: regressão em `log(publico)` | médio | baixo | 🟢 imediata |
-| M8 | share do público do ano como alvo contínuo | baixo | baixo | 🟢 imediata |
-| M6 | duração via Wikidata | médio | baixo | 🔴 bloqueada aqui |
+| **M7** | **data de estreia + salas na 1ª semana** | **muito alto** | médio | destravada |
+| M9 | ordinais a partir do histórico | médio | baixo | implementada |
+| M1 | fomento público (FSA / leis de incentivo) | alto | baixo | implementada |
+| M2 | histórico de **sucesso** (não só de contagem) | alto | baixo | imediata |
+| M3 | validação temporal com janela deslizante | médio | baixo | imediata |
+| M4 | consolidar entidade fragmentada | médio | médio | exige critério |
+| M5 | alvo alternativo: regressão em `log(publico)` | médio | baixo | imediata |
+| M8 | share do público do ano como alvo contínuo | baixo | baixo | imediata |
+| M6 | duração via Wikidata | médio | baixo | bloqueada |
 
 > **Atualização de 10/09/2026 — M1 e M7 foram destravadas.** As duas dependiam de
 > arquivos que não estão no portal do OCA nem aparecem no HTML do dados.gov.br. O
@@ -138,10 +138,10 @@ Impacto estimado, custo e viabilidade. Ordenadas por relação impacto/custo.
 > As três URLs estão testadas e registradas em `fontes.PARA_ENTREGA_2`. Licença de todas:
 > **CC-BY**.
 
-### ~~M1 — Fomento público recebido~~ ✅ **IMPLEMENTADA**
+### M1 — Fomento público recebido (implementada)
 
 > Entrou na base em 11/09/2026. Cobre **67,1%** dos filmes com CPB (31,2% FSA, 54,1%
-> leis de incentivo) e gerou seis atributos: `recebeu_fsa`, `recebeu_incentivo`,
+> leis de incentivo) e gerou cinco atributos: `recebeu_fsa`, `recebeu_incentivo`,
 > `contratos_fsa`, `projetos_incentivo` e a nominal `origem_do_fomento`.
 >
 > **O que se aprendeu com ela:** o gradiente de sucesso é forte (32,6% sem fomento
@@ -185,6 +185,13 @@ filmes com CPB `-` ficam de fora.
 **O que isso habilita.** A pergunta de política pública que justifica o projeto:
 *o dinheiro público está indo para filmes que encontram plateia?* Agora é respondível.
 
+### M9 — Ordinais a partir do histórico (implementada)
+
+> `experiencia_da_direcao` e `porte_da_distribuidora` são faixas de `filmes_diretor_antes` e
+> `filmes_distribuidora_antes`, com cortes em `build_dataset.py`. A experiência da direção
+> sobe e satura (0,43 → 0,69); o porte da distribuidora não é monótono e cai na faixa
+> grande, porque mede volume de catálogo e não poder comercial (relatório, §2.7).
+
 ### M1b — Obras registradas na ANCINE *(descoberta lateral)*
 
 `https://dados.ancine.gov.br/dados-abertos/obras-nao-pub-brasileiras-csv.zip` (2,7 MB,
@@ -205,7 +212,7 @@ mistura o diretor consagrado com o prolífico de circuito limitado.
 **Cuidado.** É o atributo com maior risco de vazamento do trabalho. Qualquer descuido
 na janela temporal e o alvo entra pela porta dos fundos. Exige teste explícito.
 
-**Viabilidade.** 🟢 Imediata — a lógica de `_historico_anterior()` já existe e só
+**Viabilidade.** Imediata — a lógica de `_historico_anterior()` já existe e só
 precisa agregar valor em vez de contar linhas.
 
 ### M3 — Validação temporal com janela deslizante
@@ -217,7 +224,7 @@ precisa agregar valor em vez de contar linhas.
 Janela deslizante dá estimativa mais estável e mostra se o desempenho **degrada** com o
 tempo — que é a pergunta prática.
 
-**Viabilidade.** 🟢 `TimeSeriesSplit` do sklearn, com atenção a agrupar por ano.
+**Viabilidade.** Imediata, com `TimeSeriesSplit` do sklearn, com atenção a agrupar por ano.
 
 ### M4 — Consolidar entidade fragmentada
 
@@ -231,7 +238,7 @@ histórico de `Downtown/Paris` ignora os 124 filmes das duas separadas.
 empresas que de fato operam separado introduz erro. Exige uma regra escrita e revisada
 pelo grupo — por isso ficou fora da Entrega 1.
 
-**Viabilidade.** 🟡 Precisa de critério humano, não de código.
+**Viabilidade.** Precisa de critério humano, não de código.
 
 ### M5 — Regressão em `log(publico)`
 
@@ -244,7 +251,7 @@ apropriada — e a métrica em log tem leitura direta: erro de 0,5 é errar por 
 **Ganho.** Elimina a arbitrariedade do corte na mediana e dá um trabalho com duas
 tarefas, classificação e regressão.
 
-**Viabilidade.** 🟢 A coluna já existe.
+**Viabilidade.** Imediata: a coluna já existe.
 
 ### M6 — Duração via Wikidata
 
@@ -262,9 +269,9 @@ seria **enviesada justamente pelo alvo** (filme popular tem verbete). Um atribut
 ausência correlacionada ao sucesso é armadilha, não melhoria. Precisaria de indicadora
 de ausência e de teste.
 
-**Viabilidade.** 🔴 Bloqueada aqui; 🟡 mesmo desbloqueada, exige cuidado.
+**Viabilidade.** Bloqueada aqui e, mesmo desbloqueada, exige cuidado.
 
-### M7 — Data de estreia e salas na primeira semana 🟢 **destravada — a melhoria mais valiosa**
+### M7 — Data de estreia e salas na primeira semana
 
 **URL testada em 10/09/2026** (registrada em `fontes.ANCINE_BILHETERIA_DIARIA`):
 
@@ -317,7 +324,7 @@ descarte. O pico de memória fica em ~26 MB, não em 3,8 GB.
 **Limite.** Concentra quase tudo perto de zero — 90% dos filmes ficariam abaixo de
 0,5% de share. Provavelmente precisaria de log de qualquer forma, e aí M5 já resolve.
 
-**Viabilidade.** 🟢 Imediata, mas o ganho sobre M5 é pequeno.
+**Viabilidade.** Imediata, mas o ganho sobre M5 é pequeno.
 
 ---
 
@@ -328,7 +335,12 @@ Decidir não aplicar uma técnica exige a mesma evidência que decidir aplicá-l
 | técnica | por que não |
 |---|---|
 | **SMOTE / undersampling / `class_weight`** | as classes já estão em 50,0/49,7 por construção do alvo. Não há minoria a reforçar. Aplicar aqui seria cumprir tabela |
-| **Remover *outlier* de público** | o IQR marca ~15% dos filmes, mas num regime de lei de potência a cauda **é o fenômeno**. Removê-la elimina justamente o que o modelo precisa reconhecer |
-| **PCA** | com 7 numéricas úteis, das quais só um par é redundante, PCA custa interpretabilidade e não resolve o problema real, que é cardinalidade categórica |
+| **Remover *outlier* de público** | o IQR marca 17,4% dos filmes, mas num regime de lei de potência a cauda **é o fenômeno**. Removê-la elimina justamente o que o modelo precisa reconhecer |
+| **PCA** | são 11 numéricas honestas e só três pares redundantes (`ano` e `filmes_no_ano`; e cada indicadora de fomento com a sua contagem, por construção). PCA custa interpretabilidade e não resolve o problema real, que é cardinalidade categórica |
 | **Imputar `max_salas` pela mediana** | a ausência é MNAR: filmes sem `max_salas` têm público mediano muito menor. Imputar apagaria o sinal. Melhor uma indicadora de ausência (H5) |
 | **Imputar os 22 filmes sem `publico`** | seriam rótulos inventados. Descartar, com registro |
+
+> **Atualização, Entrega 2.** Balanceamento e PCA voltam à grade da Entrega 2. Com o alvo no
+> percentil 75 a classe de sucesso é 25,3% (1 para 3), e o kNN, ao contrário da floresta
+> usada nas medições acima, é sensível a escala e a dimensão. As duas linhas valem para o
+> alvo na mediana e para a floresta, e a opção "sem" fica na grade para testá-las.

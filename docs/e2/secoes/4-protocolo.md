@@ -53,7 +53,7 @@ combinações venha do pré-processamento.
 | semente única | `base.SEMENTE = 42`, repassada a todo objeto com `random_state` |
 | folds materializados | `reports/e2/folds.csv` |
 | versões das bibliotecas | `reports/e2/ambiente.json`, gravado pela própria execução |
-| retomada sem perder trabalho | cada combinação é gravada assim que termina; ao reiniciar, os `id` já gravados são pulados |
+| retomada sem perder trabalho | cada combinação é gravada assim que termina; ao reiniciar, as que terminaram sem erro são puladas e as que falharam voltam para a fila |
 | falha é resultado | combinação que lança exceção vira linha com métricas vazias e a mensagem na coluna `erro`, e não derruba a grade |
 | nenhum número à mão | todo valor citado no relatório vem de arquivo em `reports/e2/` |
 

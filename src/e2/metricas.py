@@ -28,4 +28,3 @@ SCORING = {
 # A AUC ordena as combinacoes porque nao depende do ponto de corte e e a mesma
 # metrica da Entrega 1. O F1 vem logo atras porque e onde o balanceamento aparece.
 PRINCIPAL = "roc_auc"
-CO_PRINCIPAL = "f1"

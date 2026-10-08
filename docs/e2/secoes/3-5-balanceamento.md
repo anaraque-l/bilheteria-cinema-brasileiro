@@ -2,8 +2,6 @@
 
 > Dona: Laura · Orçamento: parte das 2,0 páginas da §3
 
-<!-- Rascunho. Conferir a proporção de sucessos com o módulo da base antes de fechar. Nada desta seção depende dos resultados da grade. -->
-
 **Por que balancear.** Com o alvo em P75 do ano anterior, 25,3% dos filmes são sucesso,
 ou seja, um sucesso para cada três fracassos. Na Entrega 1 decidimos não balancear, mas
 naquela época o alvo era a mediana, que divide os filmes ao meio. Com o novo alvo a classe

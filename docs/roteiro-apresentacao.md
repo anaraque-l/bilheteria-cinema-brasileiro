@@ -89,7 +89,7 @@ Aí o enquadramento:
   *depois* da estreia está fora. Só entra o que um produtor sabe quando ainda está
   decidindo.
 
-> 🗣 *"Para responder isso, precisamos de uma base. E ela deu trabalho."*
+> Passagem: *"Para responder isso, precisamos de uma base. E ela deu trabalho."*
 
 ## Tela 2 — A base e a coleta (60 s)
 
@@ -111,7 +111,7 @@ Aí o enquadramento:
 *(Se sobrar fôlego: o arquivo tem 47 linhas de rodapé que o pandas lê como filmes, a
 falta vem como texto — `ND` e `-` — e os números são pt-BR.)*
 
-> 🗣 *"Com a base pronta, a primeira coisa que olhamos foi a distribuição do público."*
+> Passagem: *"Com a base pronta, a primeira coisa que olhamos foi a distribuição do público."*
 
 ## Tela 3 — A cauda (75 s) · fig. `fig01-distribuicao-publico.png`
 
@@ -129,7 +129,7 @@ falta vem como texto — `ND` e `-` — e os números são pt-BR.)*
 > remover, é o fenômeno**. O critério IQR marca 17,4% dos filmes, e remover isso
 > eliminaria justamente o que queremos aprender a reconhecer."
 
-> 🗣 *"Diante dessa desigualdade, como é que se define 'sucesso'? [Nome] vai mostrar que
+> Passagem: *"Diante dessa desigualdade, como é que se define 'sucesso'? [Nome] vai mostrar que
 > essa pergunta é o trabalho inteiro."*
 
 ---
@@ -148,7 +148,7 @@ falta vem como texto — `ND` e `-` — e os números são pt-BR.)*
 > proporção. É que entrou uma quantidade enorme de documentário e produção de circuito
 > limitado que antes não chegava à sala. **A queda da mediana é efeito de composição.**"
 
-> 🗣 *"Guardem esse número, porque ele vai explodir na próxima tela."*
+> Passagem: *"Guardem esse número, porque ele vai explodir na próxima tela."*
 
 ## Tela 5 — O achado central (85 s) · fig. `fig08-alvo-por-decada.png`
 
@@ -186,7 +186,7 @@ Aí mostrem a figura:
 > "E fomos mais longe: auditamos o nosso próprio corte. O equilíbrio 50/50 não é achado
 > nenhum — cortar na mediana devolve 50/50 em **qualquer** distribuição."
 
-> 🗣 *"E o que sobra para prever, quando se tira o ano da jogada?"*
+> Passagem: *"E o que sobra para prever, quando se tira o ano da jogada?"*
 
 ## Tela 5b — *(opcional, 45 s)* Onde os dados colocam o corte · fig. `fig12-duas-populacoes.png`
 
@@ -205,7 +205,7 @@ pergunta mais provável da banca antes de ela ser feita.
 > anterior, que é o único conhecido antes da estreia. Em 1995 isso dá 155 mil espectadores;
 > em 2024, 5,3 mil. Números que alguém do mercado reconhece."
 
-> 🗣 *"Mudar o corte reclassifica um quarto dos filmes — por isso vamos reportar o resultado
+> Passagem: *"Mudar o corte reclassifica um quarto dos filmes — por isso vamos reportar o resultado
 > em P50, P75 e P90."*
 
 ## Tela 6 — Fomento público: o que de fato separa (55 s) · fig. `fig09-fomento.png`
@@ -226,13 +226,13 @@ pergunta mais provável da banca antes de ela ser feita.
 > não teve fomento nenhum. Isso não é crítica ao FSA — é descrição do que ele financia:
 > muito documentário e circuito limitado."
 
-⚠️ **Digam a ressalva, é o que impede a pergunta:**
+**Digam a ressalva, é o que impede a pergunta:**
 
 > "O FSA foi criado em 2006, então o indicador de FSA tem **ρ = 0,511 com o ano** — é em
 > parte um marcador de filme recente. Mas dentro dos anos 2010 isoladamente o gradiente
 > se mantém, 80% contra 29%. O efeito sobrevive ao controle temporal."
 
-> 🗣 *"Até aqui, tudo isso é argumento. E argumento pode estar errado. [Nome] vai mostrar
+> Passagem: *"Até aqui, tudo isso é argumento. E argumento pode estar errado. [Nome] vai mostrar
 > o que aconteceu quando medimos."*
 
 ---
@@ -258,7 +258,7 @@ pergunta mais provável da banca antes de ela ser feita.
 > base** — acima de qualquer numérica. Isso tem consequência prática imediata: nesta
 > base, a codificação das categóricas importa mais que a transformação das numéricas."
 
-> 🗣 *"Essa é a medida de uma decisão que a gente acertou. Faltam as três que a gente
+> Passagem: *"Essa é a medida de uma decisão que a gente acertou. Faltam as três que a gente
 > quase errou."*
 
 ## Tela 8 — Os três atalhos (85 s) — **o diferencial**

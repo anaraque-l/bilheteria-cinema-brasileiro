@@ -22,16 +22,15 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from e2 import robustez as rb
-from e2.metricas import PRINCIPAL
+from e2 import robustez as rb  # noqa: E402
+from e2.base import carregar_xy, folds  # noqa: E402
+from e2.espaco import construir_pipeline as _pipeline_da_grade  # noqa: E402
+from e2.metricas import PRINCIPAL  # noqa: E402
 
 RAIZ = Path(__file__).resolve().parent.parent
 SAIDA = RAIZ / "reports" / "e2"
 FIGURAS = RAIZ / "reports" / "figuras" / "e2"
 QUANTIS = [0.50, 0.75, 0.90]
-
-from e2.base import carregar_xy, folds
-from e2.espaco import construir_pipeline as _pipeline_da_grade
 
 PROVISORIO = False
 
@@ -134,7 +133,8 @@ def figura_temporal(temp):
     lo = min(temp["roc_auc_5fold"].min(), temp["roc_auc"].min()) - 0.01
     hi = max(temp["roc_auc_5fold"].max(), temp["roc_auc"].max()) + 0.01
     ax.plot([lo, hi], [lo, hi], ls="--", color="0.6")
-    ax.set_xlim(lo, hi), ax.set_ylim(lo, hi)
+    ax.set_xlim(lo, hi)
+    ax.set_ylim(lo, hi)
     ax.set_xlabel("AUC no 5-fold aleatório")
     ax.set_ylabel(f"AUC temporal, teste ≥ {rb.ULTIMO_ANO_TREINO + 1}")
     ax.set_title("Abaixo da diagonal, o 5-fold é otimista")

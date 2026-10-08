@@ -2,8 +2,6 @@
 
 > Dona: Laura · Orçamento: 0,75 página
 
-<!-- Rascunho. Os números da E1 vêm de docs/relatorio-entrega1.md. Os do alvo P75 devem ser conferidos com o módulo da base antes de fechar. -->
-
 **O problema.** Queremos prever se um filme brasileiro vai ter público acima do comum,
 usando apenas informações disponíveis antes da estreia. A base é a listagem oficial da
 ANCINE de 1995 a 2024, com dados de fomento público ligados a cada filme. A decisão de

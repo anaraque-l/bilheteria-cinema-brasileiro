@@ -5,7 +5,7 @@ Regra do projeto: nenhuma URL entra no notebook ou em outro modulo. Toda fonte
 mora aqui, com licenca, cobertura e a data em que o endpoint foi testado de
 verdade. Se uma fonte cair, o conserto e num lugar so.
 
-Todas as tres fontes sao publicas, federais e nao exigem cadastro, chave de
+Todas as fontes ativas sao publicas, federais e nao exigem cadastro, chave de
 API nem aceite de termos. Isso e requisito do projeto: qualquer integrante do
 grupo (e o professor) reproduz a ingestao numa maquina limpa.
 """
@@ -188,7 +188,8 @@ ANCINE_BILHETERIA_DIARIA = Fonte(
     ),
 )
 
-# A bilheteria diaria continua reservada: 486 MB e cobre so 2014 em diante.
+# Registrada para uma extensao futura: sao 486 MB, cobre so de 2014 em diante, e a
+# Entrega 2 nao a usa.
 PARA_ENTREGA_2 = (ANCINE_BILHETERIA_DIARIA,)
 
 
@@ -217,7 +218,7 @@ DESCARTADAS = {
         "externo (urllib, curl). NAO exige chave: a mesma URL responde 200 "
         "quando chamada de dentro da pagina renderizada, e e assim que se "
         "descobre o campo resources[].url. Foi o caminho que revelou o host "
-        "dados.ancine.gov.br - ver PARA_ENTREGA_2."
+        "dados.ancine.gov.br, de onde vem o fomento - ver ANCINE_FSA."
     ),
     "apisidra.ibge.gov.br": (
         "Nao resolve DNS neste ambiente. Substituido por servicodados.ibge.gov.br."
