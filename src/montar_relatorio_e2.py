@@ -26,7 +26,7 @@ MODELO_DOCX = RAIZ / "docs" / "e2" / "estilo-relatorio.docx"
 LARGURA = {"fig-al-ranking": "100%", "fig-al-interacoes": "100%",
            "fig-lf-auc-5fold-temporal": "50%"}
 
-ORDEM = ["1-contexto", "2-base-alvo-atributos", "3-1-ausentes", "3-2-encoding",
+ORDEM = ["0-resumo", "1-contexto", "2-base-alvo-atributos", "3-1-ausentes", "3-2-encoding",
          "3-3-normalizacao", "3-4-reducao", "3-5-balanceamento", "4-protocolo",
          "5-1-visao-geral", "5-2-efeitos-isolados", "5-3-interacoes", "5-4-custo",
          "6-robustez", "7-licoes-conclusao", "anexo"]
