@@ -27,7 +27,8 @@ METRICAS = ["roc_auc", "f1"]
 
 # os cruzamentos que a secao 5.3 discute
 PARES = [("normalizacao", "encoding"), ("reducao", "normalizacao"),
-         ("balanceamento", "encoding"), ("ausentes", "encoding")]
+         ("balanceamento", "encoding"), ("balanceamento", "normalizacao"),
+         ("ausentes", "encoding")]
 
 
 def main():

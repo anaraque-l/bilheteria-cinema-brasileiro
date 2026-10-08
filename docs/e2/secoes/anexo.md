@@ -36,7 +36,8 @@ mudam, no máximo, uma unidade. As métricas de corte, porém, diferem na tercei
 diferença máxima de 0,015 em precisão. A causa é a ordem de soma em ponto flutuante no cálculo das
 distâncias, que desempata de forma diferente quando dois vizinhos estão à mesma distância do
 filme avaliado. Os números deste relatório são todos do ambiente da tabela acima, que é o da
-execução gravada no repositório.
+execução gravada no repositório, e o notebook entregue foi executado nele: refaz as 144
+combinações e reproduz o `resultados.csv` com diferença máxima de 2 · 10⁻¹⁶.
 
 ## C · Partição em folds
 

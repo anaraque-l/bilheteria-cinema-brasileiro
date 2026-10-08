@@ -17,14 +17,16 @@ ganho que a Entrega 1 obteve trocando de modelo, e justifica o recorte desta ent
 pré-processamento não é preparação para o aprendizado, é parte dele.
 
 A segunda leitura vem da regra de empate e é mais incômoda. O baseline ocupa a 61ª posição entre
-144, mas **105 das 144 combinações empatam com ele** e apenas dez o superam de forma que a
-variabilidade entre folds sustente; 22 empatam com a melhor. O ranking existe, mas boa parte dele
+144, mas **104 das outras 143 combinações empatam com ele** e apenas dez o superam de forma que a
+variabilidade entre folds sustente; 21 empatam com a melhor. O ranking existe, mas boa parte dele
 é ruído: relatar apenas médias teria anunciado como descoberta uma ordenação que cinco folds não
 autorizam. O que a grade permite afirmar com segurança não é qual pipeline é o melhor, e sim
-quais opções nunca prejudicam e quais podem destruir o resultado. A §6 qualifica esse empate, ao
-mostrar que parte dele é consequência do próprio protocolo de validação.
+quais opções nunca prejudicam e quais podem destruir o resultado. A §6 acrescenta que empatar
+sob este protocolo não garante comportamento igual sob outro.
 
-Vale notar a composição das pontas. As seis piores combinações da grade são exatamente as seis
-que aplicam PCA sem normalização, e em todas elas chegam 2,0 colunas ao classificador. As
-melhores têm em comum o encoding pelo alvo e alguma normalização, em qualquer das três. A §5.2
+![As 144 combinações em ordem de AUC, com o desvio entre folds](../../../reports/figuras/e2/fig-al-ranking.png)
+
+Vale notar a composição das pontas. As doze piores combinações da grade, da 133ª à 144ª, são
+exatamente as doze que aplicam PCA sem normalização, e em todas elas chegam 2,0 colunas ao
+classificador; na figura, são os pontos depois do salto na posição 133. As melhores têm em comum o encoding pelo alvo e alguma normalização, em qualquer das três. A §5.2
 separa esses efeitos e a §5.3 mostra por que eles não são independentes.

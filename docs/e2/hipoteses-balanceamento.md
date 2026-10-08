@@ -31,8 +31,8 @@ chegar a 4 votos de 7, e mais o balanceamento deve ajudar.
 
 | hipótese | veredito | número |
 |---|---|---|
-| 1 | | |
-| 2 | | |
-| 3 | | |
-| 4 | | |
-| 5 | | |
+| 1 | confirmada, com F1 parcial | revocação +0,19, precisão −0,15 e acurácia −0,05 nos 48 contextos, sem exceção; em F1 a subamostragem vence 15 e empata 33, o SMOTE vence 9 e perde 7 |
+| 2 | confirmada | AUC: subamostragem com 44 empates e 4 derrotas em 48, todas as derrotas sem normalização; SMOTE com 1 vitória, 41 empates e 6 derrotas |
+| 3 | refutada | o SMOTE não supera a subamostragem em nenhum dos dois encodings; em F1 contra não balancear, com o encoding pelo alvo, SMOTE 5 vitórias e 4 derrotas, subamostragem 6 e 0; com one-hot, 4 e 3 contra 9 e 0 |
+| 4 | refutada no sentido | há interação no F1, mas ao contrário: sem normalização o SMOTE vence em 9 de 12 contextos, ganho +0,055; com padronização perde em 5 de 12, ganho −0,018 |
+| 5 | indício a favor, sem teste pareado | revocação média das combinações sem balanceamento cai de 0,50 em P75 para 0,24 em P90, e a das balanceadas fica entre 0,72 e 0,79 nos dois cortes; as doze da robustez não formam pares com e sem balanceamento |

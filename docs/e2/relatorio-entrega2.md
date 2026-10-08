@@ -134,7 +134,7 @@ programa, seria a codificação por frequência.
 
 A distância euclidiana soma as diferenças de todas as colunas sem distinguir o que cada uma mede,
 e nesta base as escalas são incomparáveis: o ano vai de 1996 a 2024, a contagem de filmes
-anteriores da distribuidora vai de zero a 179 com mediana 9,5, os indicadores de fomento valem
+anteriores da distribuidora vai de zero a 179 com mediana 10, os indicadores de fomento valem
 zero ou um, e os históricos, em logaritmo, ficam entre zero e cerca de sete. Sem correção, as duas
 colunas de maior amplitude decidem sozinhas quem é vizinho de quem.
 
@@ -146,7 +146,7 @@ só as numéricas esconderia a interação com o encoding que a §5.3 discute.
 | sem normalização | preserva as escalas cruas; compõe o baseline | testa se as escalas cruas já servem |
 | padronização | centra em zero e divide pelo desvio-padrão | é o tratamento direto do problema de amplitude acima |
 | escala por intervalo | comprime cada coluna para zero a um | as binárias do one-hot já vivem nesse intervalo e ficam intactas; o custo é depender do máximo, e numa coluna de cauda longa a maioria dos filmes fica perto de zero |
-| escala robusta | centra na mediana e divide pelo intervalo interquartil | a E1 documentou assimetria de 2,0 a 3,8 nos históricos, e essas são as medidas adequadas a essa cauda |
+| escala robusta | centra na mediana e divide pelo intervalo interquartil | as contagens de filmes anteriores têm assimetria de 2,0 a 3,8, e mediana e intervalo interquartil são as medidas adequadas a essa cauda |
 
 A hipótese não é a de que normalizar ajuda, que seria trivial, mas a de que a melhor normalização
 depende do encoding. O argumento é aritmético: numa coluna binária em que um por cento dos filmes
@@ -160,7 +160,8 @@ tem outra forma. Uma transformação de potência antes da escala ficou fora par
 # 3.4 · Técnicas — redução de dimensionalidade
 
 
-Com o encoding por indicadores a matriz chega a cerca de 84 colunas, boa parte quase vazia. Em
+Com o one-hot a matriz chega a cerca de 76 colunas, ou 84 com as indicadoras de ausência, boa parte
+quase vazia. Em
 dimensão alta as distâncias se concentram: o vizinho mais próximo deixa de ser significativamente
 mais próximo que o mais distante, e o voto dos sete perde o sentido que tem num espaço de poucas
 dimensões. A H13 da E1 concluiu que não valia aplicar PCA, mas foi medida com floresta aleatória,
@@ -169,7 +170,7 @@ modelo indiferente a escala e a dimensão. O kNN não é, e é essa diferença q
 | opção | estratégia | característica dos dados que a motiva |
 |---|---|---|
 | sem redução | preserva todas as colunas; compõe o baseline | é a H13 da E1, agora testada num modelo sensível a dimensão |
-| PCA retendo 95% da variância | troca as colunas por combinações delas | as 84 colunas do one-hot são em boa parte esparsas, e é o caso em que a concentração de distâncias morde |
+| PCA retendo 95% da variância | troca as colunas por combinações delas | as colunas do one-hot são em boa parte esparsas, e é o caso em que a concentração de distâncias morde |
 | seleção das dez melhores por informação mútua | mantém colunas originais e descarta o resto | a E1 achou redundância entre atributos, e na distância um atributo ruidoso pesa tanto quanto um útil |
 
 As duas técnicas atacam o mesmo problema por lados opostos, e é essa oposição que torna a
@@ -177,8 +178,8 @@ comparação informativa: o PCA preserva a variância mas entrega eixos que não
 atributo nenhum, de modo que se perde a leitura de qual característica decidiu; a seleção preserva
 essa leitura e descarta informação de forma irreversível. A informação mútua foi escolhida em vez
 do teste F porque o kNN é não paramétrico, e a relação que lhe interessa não precisa ser linear. O
-orçamento de dez colunas é absoluto, e não proporcional, porque ao seletor chegam cerca de vinte
-colunas com o encoding pelo alvo e cerca de 84 com o de indicadores: só um número igual mantém a
+orçamento de dez colunas é absoluto, e não proporcional, porque ao seletor chegam 18 ou 25
+colunas com o encoding pelo alvo e de 76 a 84 com o one-hot: só um número igual mantém a
 frase "as dez melhores colunas" com o mesmo significado nos dois casos.
 
 A etapa fica antes do balanceamento porque o PCA e a seleção precisam ser ajustados só com filmes
@@ -296,16 +297,18 @@ ganho que a Entrega 1 obteve trocando de modelo, e justifica o recorte desta ent
 pré-processamento não é preparação para o aprendizado, é parte dele.
 
 A segunda leitura vem da regra de empate e é mais incômoda. O baseline ocupa a 61ª posição entre
-144, mas **105 das 144 combinações empatam com ele** e apenas dez o superam de forma que a
-variabilidade entre folds sustente; 22 empatam com a melhor. O ranking existe, mas boa parte dele
+144, mas **104 das outras 143 combinações empatam com ele** e apenas dez o superam de forma que a
+variabilidade entre folds sustente; 21 empatam com a melhor. O ranking existe, mas boa parte dele
 é ruído: relatar apenas médias teria anunciado como descoberta uma ordenação que cinco folds não
 autorizam. O que a grade permite afirmar com segurança não é qual pipeline é o melhor, e sim
-quais opções nunca prejudicam e quais podem destruir o resultado. A §6 qualifica esse empate, ao
-mostrar que parte dele é consequência do próprio protocolo de validação.
+quais opções nunca prejudicam e quais podem destruir o resultado. A §6 acrescenta que empatar
+sob este protocolo não garante comportamento igual sob outro.
 
-Vale notar a composição das pontas. As seis piores combinações da grade são exatamente as seis
-que aplicam PCA sem normalização, e em todas elas chegam 2,0 colunas ao classificador. As
-melhores têm em comum o encoding pelo alvo e alguma normalização, em qualquer das três. A §5.2
+![As 144 combinações em ordem de AUC, com o desvio entre folds](../../reports/figuras/e2/fig-al-ranking.png)
+
+Vale notar a composição das pontas. As doze piores combinações da grade, da 133ª à 144ª, são
+exatamente as doze que aplicam PCA sem normalização, e em todas elas chegam 2,0 colunas ao
+classificador; na figura, são os pontos depois do salto na posição 133. As melhores têm em comum o encoding pelo alvo e alguma normalização, em qualquer das três. A §5.2
 separa esses efeitos e a §5.3 mostra por que eles não são independentes.
 
 # 5.2 · Efeito isolado de cada etapa
@@ -351,8 +354,8 @@ objeção contra ela. Há, porém, um achado de engenharia: a seleção empata c
 **O encoding pelo alvo tem vantagem pequena e consistente.** A diferença média, 0,007, é menor que
 o desvio entre folds e portanto é empate pela nossa regra; o pareamento mostra 13 vitórias e
 nenhuma derrota em 72 contextos, padrão difícil de atribuir ao acaso. A leitura honesta é que o
-efeito existe e é pequeno. O mecanismo é dimensional: dezoito colunas contra cerca de 84, e em
-dimensão menor as distâncias discriminam melhor.
+efeito existe e é pequeno. O mecanismo é dimensional: 18 colunas contra cerca de 76 com mediana e
+moda, 25 contra cerca de 84 com a indicadora, e em dimensão menor as distâncias discriminam melhor.
 
 **A indicadora de ausência não acrescentou nada**, o que refuta a hipótese da §3.1: zero vitórias e
 quatro derrotas em 72 contextos. A informação já estava na base, porque a falta de histórico
@@ -364,7 +367,7 @@ colunas antigas diziam, e colunas repetidas custam dimensão sem informar.
 
 | métrica | sem | subamostragem | SMOTE | pareado contra não balancear |
 |---|---|---|---|---|
-| revocação | 0,548 | 0,741 | 0,736 | 48 vitórias em 48, para as duas |
+| revocação | 0,547 | 0,741 | 0,736 | 48 vitórias em 48, para as duas |
 | precisão | 0,692 | 0,543 | 0,530 | 48 derrotas em 48, para as duas |
 | acurácia | 0,825 | 0,774 | 0,767 | 48 derrotas em 48, para as duas |
 | F1 | 0,609 | 0,625 | 0,615 | subamostragem: 15 vitórias, 33 empates |
@@ -373,11 +376,11 @@ colunas antigas diziam, e colunas repetidas custam dimensão sem informar.
 Balancear aumenta a revocação em cerca de 0,19 em todos os 48 contextos e cobra 0,15 de precisão e
 0,05 de acurácia, também sem exceção. É o que o mecanismo prevê: a AUC avalia a ordenação, que o
 balanceamento não altera, enquanto revocação e precisão avaliam a decisão tomada no corte de quatro
-votos em sete. Entre as duas técnicas a subamostragem domina o SMOTE, ganhando em F1 em quinze
-contextos sem nunca perder, enquanto o SMOTE perde em sete. É contraintuitivo, porque a
-subamostragem descarta metade dos filmes de cada treino; a explicação provável é o espaço em que o
-SMOTE opera, interpolando numa matriz com colunas de indicadores e produzindo filmes com meia
-distribuidora, que entram na votação como se fossem reais.
+votos em sete. Entre as duas técnicas a subamostragem é a mais segura: contra não balancear, ganha
+em F1 em quinze contextos e não perde em nenhum, enquanto o SMOTE ganha em nove e perde em sete. É
+contraintuitivo, porque a subamostragem descarta metade dos filmes de cada treino; a explicação
+provável é o espaço em que o SMOTE opera, interpolando numa matriz com colunas de indicadores e
+produzindo filmes com meia distribuidora, que entram na votação como se fossem reais.
 
 **Verificação independente.** A regra de empate é o critério do enunciado, e é por ela que o
 relatório decide. Como checagem, aplicamos também o teste de Wilcoxon pareado sobre as diferenças
@@ -393,15 +396,19 @@ por fold, aproveitando que os folds são idênticos em todas as combinações.
 | subamostragem em AUC | 240 | −0,001 | 0,26 |
 
 As afirmações fortes passam com margem larga, e a única comparação não significativa é justamente
-a que afirmamos ser nula, o efeito do balanceamento na AUC.
+a que afirmamos ser nula, o efeito do balanceamento na AUC. Os pares não são independentes, porque
+contextos vizinhos compartilham etapas e os cinco folds são os mesmos, e por isso os valores de p
+são otimistas; servem para confirmar a direção, não para medir a força do efeito.
 
 # 5.3 · Interações
 
 
 O enunciado define interação como a técnica que só se mostra benéfica na presença de outra. O
 módulo de análise procura isso sem intervenção: compara cada opção com a sua referência dentro de
-cada recorte da outra etapa e marca interação quando o veredito muda de recorte para recorte. Dois
-pares foram marcados.
+cada recorte da outra etapa e marca interação quando o veredito muda de recorte para recorte. Na AUC,
+dois pares foram marcados.
+
+![AUC média em cada cruzamento de duas etapas](../../reports/figuras/e2/fig-al-interacoes.png)
 
 **A redução depende da normalização.**
 
@@ -418,7 +425,7 @@ combinações de PCA sem normalização esse número é 2,0. O corte de 95% da v
 componentes, o que faz sentido, porque sem correção de escala a variância total é quase toda da
 contagem de filmes anteriores da distribuidora e do ano; dois componentes bastam para reproduzir
 essas duas colunas, e os demais atributos cabem nos 5% descartados. O classificador recebe um
-espaço de duas dimensões que sabe apenas o porte da distribuidora e o ano, e as seis piores
+espaço de duas dimensões que sabe apenas o porte da distribuidora e o ano, e as doze piores
 combinações do ranking são exatamente essas.
 
 O teste pareado acrescenta uma leitura. Sem normalização, a perda de 0,065 tem p = 2 · 10⁻¹¹ em
@@ -452,18 +459,21 @@ para o one-hot, de 0,049 para 0,024, enquanto a padronização cai menos, de 0,0
 
 A explicação inverte o nosso próprio argumento. A escala por intervalo não mexe nas colunas
 binárias, mas comprime as numéricas de cauda longa para uma faixa estreita perto de zero, já que
-são governadas pelo máximo; as cerca de 84 colunas de indicadores passam a ter amplitude efetiva
-maior que as numéricas e dominam a distância. A padronização iguala a dispersão de todas as
+são governadas pelo máximo; as dezenas de colunas binárias do one-hot passam a ter amplitude
+efetiva maior que as numéricas e dominam a distância. A padronização iguala a dispersão de todas as
 colunas, inclusive as binárias, e impede que qualquer grupo domine. Quanto ao fator 9,9, a
 explicação provável para a sua ausência está numa decisão da etapa anterior: o one-hot agrupa as
 categorias com menos de dez filmes, de modo que as colunas raríssimas das quais o argumento
 dependia não chegam a existir. É hipótese compatível com o medido, não efeito isolado; isolá-lo
 exigiria rodar a grade sem esse agrupamento, o que fica como extensão na §7.
 
-O par balanceamento e normalização não foi marcado como interação: as duas técnicas empatam com não
-balancear em todos os recortes, e só a magnitude muda. Ainda assim, a subamostragem tem ganho médio
-de −0,013 sem normalização e de +0,007 com padronização, pelo mesmo mecanismo: ela descarta metade
-dos filmes e a densidade de vizinhos cai, o que agrava um espaço já decidido por duas colunas e se
+O par balanceamento e normalização não é interação na AUC, em que as duas técnicas empatam com não
+balancear pelo veredito de cada recorte, mas é no F1. Sem normalização, balancear vence em F1, a
+subamostragem em oito dos doze contextos e o SMOTE em nove; com qualquer escala, o veredito passa a
+empate. O kNN sem escala é o que mais erra por não alcançar quatro votos de sucesso, e é ali que
+inflar a classe rara mais rende. Na AUC sobra só a magnitude: a subamostragem tem ganho médio de
+−0,013 sem normalização, com quatro derrotas, e de +0,007 com padronização, porque descartar metade
+dos filmes reduz a densidade de vizinhos, o que agrava um espaço já decidido por duas colunas e se
 paga num espaço escalado.
 
 # 5.4 · Custo
@@ -480,7 +490,7 @@ combinação e máximo de 3,99 segundos.
 | redução | sem redução, 0,76 s | seleção de dez colunas, 2,60 s |
 | balanceamento | subamostragem, 1,56 s | SMOTE, 1,69 s |
 
-Três leituras. A normalização, que domina o resultado, é praticamente de graça: 0,41 segundo
+Três leituras. A normalização, que domina o resultado, é praticamente de graça: 0,42 segundo
 separa a mais barata da mais cara, e as três escalas custam o mesmo entre si, com diferença de
 0,07 segundo. A etapa de maior efeito é a de menor custo relativo da grade.
 
@@ -489,12 +499,12 @@ combinações mais caras são todas interseção das duas, todas com imputação
 cara leva 3,99 segundos, mais de quatro vezes a mediana.
 
 A terceira leitura é a interessante. A correlação de Spearman entre o tempo total e o número de
-colunas que chegam ao classificador é negativa, de −0,144: combinações com mais colunas tendem a
-ser mais rápidas, o que parece absurdo e não é. As dez mais caras entregam exatamente dez colunas
+colunas que chegam ao classificador é de −0,144, fraca e não significativa (p = 0,09): a dimensão
+final não prediz o tempo, o que parece absurdo e não é. As dez mais caras entregam exatamente dez colunas
 ao kNN, porque todas usam a seleção; o custo não está em medir distância em muitas dimensões, está
 em estimar informação mútua entre 84 colunas e o alvo, cinco vezes, uma por fold, antes de o
-classificador existir. Nesta grade o gargalo é o ajuste do pré-processamento, não a predição, e é
-por isso que a dimensão final não prediz o tempo.
+classificador existir. Nas combinações com seleção o gargalo é o ajuste do pré-processamento, não a
+predição, e é por isso que a dimensão final não prediz o tempo.
 
 A consequência de projeto é que a seleção, que custa mais que o triplo de não reduzir e não ganha
 em nenhum contexto, só se paga quando o objetivo é um modelo final mais enxuto: compra-se uma
@@ -517,25 +527,36 @@ E1 e substituída pelo enunciado desta entrega.
 | alvo, padronização, PCA, subamostragem | 0,853 | 0,793 | 0,060 |
 | alvo, padronização, subamostragem | 0,848 | 0,790 | 0,058 |
 | alvo, escala por intervalo, PCA | 0,850 | 0,738 | 0,113 |
-| PCA sem normalização, quatro variantes | 0,731 a 0,750 | 0,531 a 0,556 | 0,176 a 0,219 |
+| alvo, escala por intervalo | 0,848 | 0,749 | 0,098 |
+| alvo, escala por intervalo, PCA, SMOTE | 0,842 | 0,739 | 0,104 |
+| PCA sem normalização, cinco variantes | 0,731 a 0,750 | 0,531 a 0,556 | 0,176 a 0,219 |
+
+![AUC em cinco folds contra AUC no teste de 2018 em diante, por combinação](../../reports/figuras/e2/fig-lf-auc-5fold-temporal.png)
 
 Todas as doze são otimistas na divisão aleatória, o que a §4 já declarava. O que não esperávamos é
 a distribuição desse otimismo: o baseline é o mais otimista de todos e cai para 0,588, quase o
-acaso, enquanto as três melhores, todas com normalização e encoding pelo alvo, perdem entre 0,049 e
-0,060 e seguem acima de 0,79.
+acaso, enquanto as três com padronização, encoding pelo alvo e subamostragem perdem entre 0,049 e
+0,060 e seguem acima de 0,79. As três com escala por intervalo perdem o dobro, de 0,098 a 0,113.
 
 O pré-processamento, portanto, não melhora apenas o número do relatório: muda o que o modelo
-aprende. Sem normalização e com one-hot, as 455 colunas de distribuidora deixam o kNN reconhecer o
-filme pela identidade de quem o distribui, atalho que funciona dentro do mesmo período e não
-transfere para anos em que as distribuidoras são outras. Isso qualifica a §5.1: parte dos 105
-empates com o baseline é artefato da divisão aleatória, porque pipelines indistinguíveis em cinco
-folds se separam em mais de 0,20 de AUC quando o teste é o futuro.
+aprende. Sem escala, a distância é decidida pelo ano e pela contagem de filmes anteriores da
+distribuidora, como mostrou a §5.3, e as duas crescem com o tempo: todo filme do teste é de um ano
+que o treino não tem, e as distribuidoras chegam ao teste com mais filmes acumulados do que tinham
+no treino. Na divisão aleatória o vizinho mais próximo tende a ser de um ano próximo; no futuro, é
+só o filme mais recente do treino. As combinações de PCA sem normalização, que guardam apenas essas
+duas colunas, têm otimismo próximo ao do baseline, e a padronização, que as põe no mesmo peso das
+demais, é a que menos perde. A escala por intervalo fica no meio por depender do máximo do treino,
+que o teste ultrapassa.
+
+Isso qualifica a §5.1. As seis combinações com normalização desta tabela empatam com a melhor em
+cinco folds e, no futuro, ficam entre 0,738 e 0,799: empate sob um protocolo não é equivalência
+sob outro.
 
 **Troca do corte do alvo.** Nos percentis 50, 75 e 90 do ano anterior, a correlação de Spearman
 entre as ordenações é de 0,825 entre P50 e P75, de 0,867 entre P75 e P90 e de 0,664 entre P50 e
 P90, todas significativas: a ordenação é estável e menos estável nos extremos, o que é natural
 porque P50 e P90 definem problemas diferentes. A separação qualitativa não muda: nos três cortes as
-combinações com normalização e encoding pelo alvo ficam entre 0,770 e 0,881, e as de PCA sem
+combinações com normalização e encoding pelo alvo ficam entre 0,770 e 0,880, e as de PCA sem
 normalização entre 0,711 e 0,750.
 
 **Desempenho por gênero.** A terceira checagem revela a limitação mais séria do modelo.
@@ -563,7 +584,8 @@ altera diretamente a métrica de distância é a que mexe na escala.
 
 **O perigo não está nas técnicas ruins, está nas combinações incoerentes.** A pior configuração da
 grade não usa nenhuma técnica desaconselhada: aplica PCA, que é padrão, sobre uma matriz não
-escalada, e sobram dois componentes que descrevem duas colunas, com perda de 0,065 de AUC. A lição
+escalada, e sobram dois componentes que descrevem duas colunas; nas doze vezes em que isso ocorre,
+o PCA perde em média 0,065 de AUC contra não reduzir. A lição
 vale para qualquer pipeline em que uma etapa pressuponha o trabalho de outra, e é o argumento mais
 forte a favor de examinar o espaço de combinações em vez de ajustar uma etapa por vez.
 
@@ -571,21 +593,23 @@ forte a favor de examinar o espaço de combinações em vez de ajustar uma etapa
 ainda assim a seleção empata com a matriz completa em 43 dos 48, o que significa que quatro quintos
 das colunas podem ser descartados sem custo mensurável em AUC.
 
-**A regra de empate mudou o relatório, e a validação temporal mudou a regra de empate.** Com 105 das
-144 combinações empatando com o baseline, quase nada do que um ranking por média sugeriria sobrevive
-à variabilidade entre cinco folds. A §6 mostrou o outro lado: parte daqueles empates é artefato do
-protocolo, e o baseline é o que menos sobrevive ao futuro, caindo de 0,827 para 0,588. Empate sob um
-protocolo não é equivalência, e vale pouco sem uma segunda forma de validar.
+**A regra de empate mudou o relatório, e a validação temporal mostrou o seu limite.** Com 104 das
+outras 143 combinações empatando com o baseline, quase nada do que um ranking por média sugeriria
+sobrevive à variabilidade entre cinco folds. A §6 mostrou o outro lado: seis combinações que empatam
+com a melhor em cinco folds se separam em cerca de 0,06 de AUC no futuro, e o baseline é o que menos
+sobrevive, caindo de 0,827 para 0,588. Empate sob um protocolo não é equivalência, e vale pouco sem
+uma segunda forma de validar.
 
-**O pré-processamento não melhora o modelo, muda o que ele aprende.** Sem normalização e com
-one-hot, as colunas de distribuidora permitem ao kNN reconhecer o filme por quem o distribui, atalho
-que não transfere para outros anos; trocar essa identidade por uma coluna de reputação e corrigir a
-escala produz um modelo que perde 0,05 ao prever o futuro, em vez de 0,24.
+**O pré-processamento não melhora o modelo, muda o que ele aprende.** Sem escala, o kNN escolhe
+vizinhos pelo ano e pelas contagens acumuladas, que mudam com o tempo, e por isso aprende um atalho
+que não transfere para outros anos; corrigir a escala e trocar a identidade da distribuidora por uma
+coluna de reputação produz um modelo que perde 0,05 ao prever o futuro, em vez de 0,24.
 
 **Limitações.** A contaminação indireta entre folds, descrita na §4, decorre de o enunciado fixar
 divisão aleatória e é o que a validação temporal mede. O desempenho em documentário, com revocação
-de 0,118, mostra que o modelo não serve para esse segmento e que nenhuma opção da grade corrige
-isso. E o número de vizinhos, fixado em sete, interage com o balanceamento de forma que não pudemos
+de 0,118, mostra que o modelo não serve para esse segmento. Entre as doze combinações verificadas,
+as únicas que passam de 0,47 nessa revocação são as de PCA sem normalização com subamostragem, e
+elas o fazem marcando mais filmes como sucesso, com AUC de 0,64 nesse gênero contra 0,69 da melhor. E o número de vizinhos, fixado em sete, interage com o balanceamento de forma que não pudemos
 explorar, porque o limite de quatro votos em sete é parte da razão pela qual a classe minoritária
 raramente é prevista.
 
@@ -631,7 +655,8 @@ mudam, no máximo, uma unidade. As métricas de corte, porém, diferem na tercei
 diferença máxima de 0,015 em precisão. A causa é a ordem de soma em ponto flutuante no cálculo das
 distâncias, que desempata de forma diferente quando dois vizinhos estão à mesma distância do
 filme avaliado. Os números deste relatório são todos do ambiente da tabela acima, que é o da
-execução gravada no repositório.
+execução gravada no repositório, e o notebook entregue foi executado nele: refaz as 144
+combinações e reproduz o `resultados.csv` com diferença máxima de 2 · 10⁻¹⁶.
 
 ## C · Partição em folds
 

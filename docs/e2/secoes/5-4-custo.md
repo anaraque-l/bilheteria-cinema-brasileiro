@@ -13,7 +13,7 @@ combinação e máximo de 3,99 segundos.
 | redução | sem redução, 0,76 s | seleção de dez colunas, 2,60 s |
 | balanceamento | subamostragem, 1,56 s | SMOTE, 1,69 s |
 
-Três leituras. A normalização, que domina o resultado, é praticamente de graça: 0,41 segundo
+Três leituras. A normalização, que domina o resultado, é praticamente de graça: 0,42 segundo
 separa a mais barata da mais cara, e as três escalas custam o mesmo entre si, com diferença de
 0,07 segundo. A etapa de maior efeito é a de menor custo relativo da grade.
 
@@ -22,12 +22,12 @@ combinações mais caras são todas interseção das duas, todas com imputação
 cara leva 3,99 segundos, mais de quatro vezes a mediana.
 
 A terceira leitura é a interessante. A correlação de Spearman entre o tempo total e o número de
-colunas que chegam ao classificador é negativa, de −0,144: combinações com mais colunas tendem a
-ser mais rápidas, o que parece absurdo e não é. As dez mais caras entregam exatamente dez colunas
+colunas que chegam ao classificador é de −0,144, fraca e não significativa (p = 0,09): a dimensão
+final não prediz o tempo, o que parece absurdo e não é. As dez mais caras entregam exatamente dez colunas
 ao kNN, porque todas usam a seleção; o custo não está em medir distância em muitas dimensões, está
 em estimar informação mútua entre 84 colunas e o alvo, cinco vezes, uma por fold, antes de o
-classificador existir. Nesta grade o gargalo é o ajuste do pré-processamento, não a predição, e é
-por isso que a dimensão final não prediz o tempo.
+classificador existir. Nas combinações com seleção o gargalo é o ajuste do pré-processamento, não a
+predição, e é por isso que a dimensão final não prediz o tempo.
 
 A consequência de projeto é que a seleção, que custa mais que o triplo de não reduzir e não ganha
 em nenhum contexto, só se paga quando o objetivo é um modelo final mais enxuto: compra-se uma

@@ -42,8 +42,8 @@ objeção contra ela. Há, porém, um achado de engenharia: a seleção empata c
 **O encoding pelo alvo tem vantagem pequena e consistente.** A diferença média, 0,007, é menor que
 o desvio entre folds e portanto é empate pela nossa regra; o pareamento mostra 13 vitórias e
 nenhuma derrota em 72 contextos, padrão difícil de atribuir ao acaso. A leitura honesta é que o
-efeito existe e é pequeno. O mecanismo é dimensional: dezoito colunas contra cerca de 84, e em
-dimensão menor as distâncias discriminam melhor.
+efeito existe e é pequeno. O mecanismo é dimensional: 18 colunas contra cerca de 76 com mediana e
+moda, 25 contra cerca de 84 com a indicadora, e em dimensão menor as distâncias discriminam melhor.
 
 **A indicadora de ausência não acrescentou nada**, o que refuta a hipótese da §3.1: zero vitórias e
 quatro derrotas em 72 contextos. A informação já estava na base, porque a falta de histórico
@@ -55,7 +55,7 @@ colunas antigas diziam, e colunas repetidas custam dimensão sem informar.
 
 | métrica | sem | subamostragem | SMOTE | pareado contra não balancear |
 |---|---|---|---|---|
-| revocação | 0,548 | 0,741 | 0,736 | 48 vitórias em 48, para as duas |
+| revocação | 0,547 | 0,741 | 0,736 | 48 vitórias em 48, para as duas |
 | precisão | 0,692 | 0,543 | 0,530 | 48 derrotas em 48, para as duas |
 | acurácia | 0,825 | 0,774 | 0,767 | 48 derrotas em 48, para as duas |
 | F1 | 0,609 | 0,625 | 0,615 | subamostragem: 15 vitórias, 33 empates |
@@ -64,11 +64,11 @@ colunas antigas diziam, e colunas repetidas custam dimensão sem informar.
 Balancear aumenta a revocação em cerca de 0,19 em todos os 48 contextos e cobra 0,15 de precisão e
 0,05 de acurácia, também sem exceção. É o que o mecanismo prevê: a AUC avalia a ordenação, que o
 balanceamento não altera, enquanto revocação e precisão avaliam a decisão tomada no corte de quatro
-votos em sete. Entre as duas técnicas a subamostragem domina o SMOTE, ganhando em F1 em quinze
-contextos sem nunca perder, enquanto o SMOTE perde em sete. É contraintuitivo, porque a
-subamostragem descarta metade dos filmes de cada treino; a explicação provável é o espaço em que o
-SMOTE opera, interpolando numa matriz com colunas de indicadores e produzindo filmes com meia
-distribuidora, que entram na votação como se fossem reais.
+votos em sete. Entre as duas técnicas a subamostragem é a mais segura: contra não balancear, ganha
+em F1 em quinze contextos e não perde em nenhum, enquanto o SMOTE ganha em nove e perde em sete. É
+contraintuitivo, porque a subamostragem descarta metade dos filmes de cada treino; a explicação
+provável é o espaço em que o SMOTE opera, interpolando numa matriz com colunas de indicadores e
+produzindo filmes com meia distribuidora, que entram na votação como se fossem reais.
 
 **Verificação independente.** A regra de empate é o critério do enunciado, e é por ela que o
 relatório decide. Como checagem, aplicamos também o teste de Wilcoxon pareado sobre as diferenças
@@ -84,4 +84,6 @@ por fold, aproveitando que os folds são idênticos em todas as combinações.
 | subamostragem em AUC | 240 | −0,001 | 0,26 |
 
 As afirmações fortes passam com margem larga, e a única comparação não significativa é justamente
-a que afirmamos ser nula, o efeito do balanceamento na AUC.
+a que afirmamos ser nula, o efeito do balanceamento na AUC. Os pares não são independentes, porque
+contextos vizinhos compartilham etapas e os cinco folds são os mesmos, e por isso os valores de p
+são otimistas; servem para confirmar a direção, não para medir a força do efeito.
