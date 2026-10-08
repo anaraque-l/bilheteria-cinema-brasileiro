@@ -78,6 +78,11 @@ class TestFolds(unittest.TestCase):
         for _, teste in self.pares:
             self.assertAlmostEqual(self.y.iloc[teste].mean(), self.y.mean(), delta=0.01)
 
+    def test_os_tres_cortes_tem_as_mesmas_linhas(self):
+        # a robustez reaproveita estes folds em P50 e P90, o que so vale se as linhas forem as mesmas
+        indices = [base.carregar_xy(quantil=q)[0].index for q in (0.50, 0.75, 0.90)]
+        self.assertTrue(all(i.equals(indices[1]) for i in indices))
+
     def test_sempre_os_mesmos(self):
         for (a, b), (c, d) in zip(self.pares, base.folds()):
             self.assertTrue(np.array_equal(a, c) and np.array_equal(b, d))

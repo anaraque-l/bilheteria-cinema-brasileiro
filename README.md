@@ -177,6 +177,12 @@ python src/e2/base.py         # resumo da base e teste de que o historico nao va
 python src/executar_e2.py     # roda as 144; retoma de onde parou
 ```
 
+Estado atual: base, alvo, folds, as etapas de ausentes, encoding e balanceamento, as
+métricas, o motor, a robustez e o anexo estão prontos e testados. Faltam as etapas de
+normalização e redução e a análise dos resultados; até lá a grade não roda, e
+`src/robustez_e2.py` usa substitutos provisórios de `src/e2/_provisorio.py` e avisa que os
+números não valem.
+
 O motor precisa das cinco etapas em `src/e2/etapas/` e das métricas em `src/e2/`. Os
 resultados vão para `reports/e2/`: `resultados.csv` com uma linha por combinação,
 `resultados_por_fold.csv` com uma por combinação e fold, `folds.csv` e `ambiente.json`
