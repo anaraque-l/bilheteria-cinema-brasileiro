@@ -1,0 +1,11 @@
+id,codigo,n_atributos,tempo_total_s
+99,mediana_indicadora|onehot|minmax|kbest|smote,10.0,3.9886254559996814
+88,mediana_indicadora|onehot|padrao|kbest|sem,10.0,3.915185504999954
+108,mediana_indicadora|onehot|robusto|kbest|smote,10.0,3.9096052150002834
+106,mediana_indicadora|onehot|robusto|kbest|sem,10.0,3.906717913999501
+90,mediana_indicadora|onehot|padrao|kbest|smote,10.0,3.897875247000229
+89,mediana_indicadora|onehot|padrao|kbest|subamostragem,10.0,3.885183295000161
+81,mediana_indicadora|onehot|sem|kbest|smote,10.0,3.7929067730001407
+97,mediana_indicadora|onehot|minmax|kbest|sem,10.0,3.788968737999767
+107,mediana_indicadora|onehot|robusto|kbest|subamostragem,10.0,3.72493101699979
+79,mediana_indicadora|onehot|sem|kbest|sem,10.0,3.677233638999951

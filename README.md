@@ -53,6 +53,8 @@ percentil 69. Por isso a Entrega 2 usa o percentil 75 do ano anterior como alvo.
 │   ├── sensibilidades.py      mede o peso de cada decisao de pre-processamento
 │   ├── auditoria_alvo.py      audita a definicao de sucesso
 │   ├── executar_e2.py         Entrega 2: roda as 144 combinacoes
+│   ├── analisar_e2.py         Entrega 2: tabelas e figuras da analise
+│   ├── robustez_e2.py         Entrega 2: as tres checagens de robustez
 │   └── e2/                    Entrega 2: base, folds, combinacoes e etapas
 ├── notebooks/                 notebook da Entrega 1, executado
 ├── docs/
@@ -174,17 +176,17 @@ balanceamento → kNN`; o motivo de cada posição está em `src/e2/espaco.py`.
 
 ```bash
 python src/e2/base.py         # resumo da base e teste de que o historico nao vaza
-python src/executar_e2.py     # roda as 144; retoma de onde parou
+python src/executar_e2.py     # roda as 144, cerca de 4 minutos; retoma de onde parou
+python src/analisar_e2.py     # empate, ranking, efeitos, interacoes, custo e figuras
+python src/robustez_e2.py     # particao temporal, cortes P50 e P90, e por genero
+python src/e2/anexo.py        # tabela das 144 para o anexo
 ```
 
-Estado atual: base, alvo, folds, as etapas de ausentes, encoding e balanceamento, as
-métricas, o motor, a robustez e o anexo estão prontos e testados. Faltam as etapas de
-normalização e redução e a análise dos resultados; até lá a grade não roda, e
-`src/robustez_e2.py` usa substitutos provisórios de `src/e2/_provisorio.py` e avisa que os
-números não valem.
+Estado atual: as cinco etapas, o motor, a análise, a robustez e o anexo estão prontos e
+testados, e a grade rodou sem nenhuma combinação com erro. Rodar a grade duas vezes dá as
+mesmas métricas. Faltam o notebook da Entrega 2 e as seções de resultados do relatório.
 
-O motor precisa das cinco etapas em `src/e2/etapas/` e das métricas em `src/e2/`. Os
-resultados vão para `reports/e2/`: `resultados.csv` com uma linha por combinação,
+Os resultados vão para `reports/e2/`: `resultados.csv` com uma linha por combinação,
 `resultados_por_fold.csv` com uma por combinação e fold, `folds.csv` e `ambiente.json`
 com as versões das bibliotecas.
 
