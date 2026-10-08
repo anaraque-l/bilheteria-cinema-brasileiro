@@ -118,7 +118,7 @@ em que trabalhamos.
 
 ---
 
-## O que a Entrega 1 encontrou
+## Entrega 1: análise exploratória e hipóteses
 
 O público tem cauda muito longa: mediana de 2.806 espectadores e média de 148.399,
 assimetria 10,0 e curtose 135,2. O 1% de filmes de maior público concentra 36% do total; a
